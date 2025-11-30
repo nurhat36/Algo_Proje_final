@@ -1,4 +1,4 @@
-package org.example.algo_proje;
+package org.example.algo_proje.Controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
