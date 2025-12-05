@@ -1,0 +1,74 @@
+/* login.css */
+
+/* 1. Ana Kök Pencere Stili (AnchorPane) */
+.root-pane {
+    /* Orijinal FXML'deki degrade arka plan */
+    -fx-background-color: linear-gradient(to bottom right, #4A90E2, #9013FE);
+}
+
+/* 2. Giriş Kartı Stili (VBox) */
+.login-card {
+    /* Orijinal FXML'deki beyaz arka plan, dolgu, radius ve gölge */
+    -fx-background-color: white;
+    -fx-padding: 40px;
+    -fx-background-radius: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 20, 0, 0, 5);
+}
+
+/* 3. Kart Başlığı Stili (Label) */
+.card-title {
+    /* Orijinal FXML'deki font boyutu ve kalınlık */
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333; /* Başlık rengi için koyu ton */
+}
+
+/* 4. Giriş Alanları Stili (TextField, PasswordField) */
+.form-input {
+    /* Orijinal FXML'deki radius ve dolgu */
+    -fx-background-radius: 10px;
+    -fx-padding: 10px;
+    -fx-border-color: #CCCCCC; /* Hafif bir kenarlık ekleyelim */
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+}
+
+/* Input alanlarına odaklanıldığında stil (opsiyonel) */
+.form-input:focused {
+    -fx-border-color: #4A90E2;
+    -fx-border-width: 2px;
+}
+
+/* 5. Giriş Yap Butonu Stili */
+.login-button {
+    /* Orijinal FXML'deki stil */
+    -fx-background-color: #4A90E2;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-background-radius: 15px;
+    -fx-padding: 8px 0px; /* Üst/Alt 8, Sol/Sağ 0 - prefWidth tanımlı olduğu için */
+}
+
+/* Giriş Butonu üzerine gelindiğinde (Hover) */
+.login-button:hover {
+    -fx-background-color: #6AADEF; /* Hafif açılmış renk */
+}
+
+/* 6. Kayıt Ol Butonu Stili */
+.register-button {
+    /* Orijinal FXML'deki stil */
+    -fx-background-color: transparent;
+    -fx-border-color: #4A90E2;
+    -fx-border-width: 2px;
+    -fx-text-fill: #4A90E2;
+    -fx-font-size: 15px;
+    -fx-background-radius: 15px;
+    -fx-border-radius: 15px;
+    -fx-padding: 8px 0px;
+}
+
+/* Kayıt Ol Butonu üzerine gelindiğinde (Hover) */
+.register-button:hover {
+    -fx-background-color: #4A90E21A; /* Hafif şeffaf arka plan */
+    -fx-cursor: hand;
+}

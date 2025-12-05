@@ -17,6 +17,12 @@ public class RegisterController {
     @FXML private TextField txtEmail;
     @FXML private PasswordField txtPassword;
 
+    private MainController mainController;
+
+    public void setMainController(MainController m) {
+        this.mainController = m;
+    }
+
     public void registerClick() {
         boolean ok = UserService.register(
                 txtFullName.getText(),
@@ -31,13 +37,7 @@ public class RegisterController {
             System.out.println("Kayıt başarısız!");
     }
     @FXML
-    public void openLogin() {
-        try {
-            Parent root = FXMLLoader.load(getClass().getResource("/org/example/algo_proje/Views/login.fxml"));
-            Stage stage = (Stage) txtFullName.getScene().getWindow();
-            stage.setScene(new Scene(root));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    private void openLogin() {
+        if (mainController != null) mainController.showLogin();
     }
 }

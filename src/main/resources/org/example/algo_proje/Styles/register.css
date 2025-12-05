@@ -1,0 +1,68 @@
+/* register.css */
+
+/* 1. Ana Kök Pencere Stili (AnchorPane) */
+.root-pane {
+    /* Orijinal FXML'deki degrade arka plan: mor ve mavi tonları */
+    -fx-background-color: linear-gradient(to bottom right, #8e44ad, #3498db);
+}
+
+/* 2. Kayıt Kartı Stili (VBox) */
+.register-card {
+    /* Orijinal FXML'deki beyaz arka plan ve radius */
+    -fx-background-color: white;
+    -fx-background-radius: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 15, 0, 0, 3); /* Hafif gölge ekleyelim */
+}
+
+/* 3. Kart Başlığı Stili (Label) */
+.card-title {
+    /* Orijinal FXML'deki font boyutu ve kalınlık */
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+    -fx-padding: 0 0 10px 0; /* Alttan biraz boşluk */
+}
+
+/* 4. Giriş Alanları Stili (TextField, PasswordField) */
+.form-input {
+    /* Orijinal FXML'deki radius */
+    -fx-background-radius: 10px;
+    -fx-padding: 8px 10px;
+    -fx-border-color: #CCCCCC;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+}
+
+/* Input alanlarına odaklanıldığında stil */
+.form-input:focused {
+    -fx-border-color: #8e44ad; /* Ana renk ile uyumlu */
+    -fx-border-width: 2px;
+}
+
+/* 5. Kayıt Ol Butonu Stili */
+.register-button {
+    /* Orijinal FXML'deki stil */
+    -fx-background-color: #8e44ad;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-background-radius: 10px;
+    -fx-padding: 10px 40px; /* Butonu biraz daha büyük yapalım */
+    -fx-pref-width: 200px;
+}
+
+/* Buton üzerine gelindiğinde (Hover) */
+.register-button:hover {
+    -fx-background-color: #a366c3; /* Hafif açılmış renk */
+    -fx-cursor: hand;
+}
+
+/* 6. Giriş Bağlantısı Stili (Hyperlink) */
+.login-link {
+    /* Orijinal FXML'deki stil */
+    -fx-font-size: 12px;
+    -fx-text-fill: #3498db; /* Mavi tonu */
+}
+
+.login-link:hover {
+    -fx-underline: true;
+}

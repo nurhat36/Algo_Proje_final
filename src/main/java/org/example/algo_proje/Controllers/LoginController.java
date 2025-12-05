@@ -14,6 +14,13 @@ public class LoginController {
     @FXML
     private PasswordField txtPassword;
 
+    private MainController mainController;
+
+    public void setMainController(MainController m) {
+        this.mainController = m;
+    }
+
+
     public void loginClick() {
         boolean ok = UserService.login(
                 txtUser.getText(),
@@ -27,18 +34,7 @@ public class LoginController {
     }
     @FXML
     private void openRegister() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/algo_proje/Views/Register.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = new Stage();
-            stage.setTitle("Kayıt Ol");
-            stage.setScene(new Scene(root));
-            stage.show();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        if (mainController != null) mainController.showRegister();
     }
 
 }

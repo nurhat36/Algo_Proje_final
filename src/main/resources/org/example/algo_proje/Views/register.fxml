@@ -5,34 +5,26 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
+<?import java.net.URL?>
 <AnchorPane prefHeight="500" prefWidth="700"
-            style="-fx-background-color: linear-gradient(to bottom right, #8e44ad, #3498db);"
-            xmlns="http://javafx.com/javafx/23.0.1"
+            styleClass="root-pane" xmlns="http://javafx.com/javafx/23.0.1"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.algo_proje.Controllers.RegisterController">
 
+    <stylesheets>
+        <URL value="@../Styles/register.css" />
+    </stylesheets>
+
     <VBox alignment="CENTER" spacing="12" prefWidth="380" layoutX="160" layoutY="65"
-          style="-fx-background-color: white; -fx-background-radius: 20;">
-        <padding>
-            <Insets top="30" right="30" bottom="30" left="30"/>
-        </padding>
+          styleClass="register-card"> <padding>
+        <Insets top="30" right="30" bottom="30" left="30"/>
+    </padding>
 
-        <Label text="Kayıt Ol" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-
-        <TextField fx:id="txtFullName" promptText="Ad Soyad"
-                   style="-fx-background-radius: 10;"/>
-        <TextField fx:id="txtUsername" promptText="Kullanıcı Adı"
-                   style="-fx-background-radius: 10;"/>
-        <TextField fx:id="txtEmail" promptText="E-posta"
-                   style="-fx-background-radius: 10;"/>
-        <PasswordField fx:id="txtPassword" promptText="Şifre"
-                       style="-fx-background-radius: 10;"/>
-
-        <Button text="Kayıt Ol" onAction="#registerClick"
-                style="-fx-background-color: #8e44ad; -fx-text-fill: white;
-                       -fx-background-radius: 10; -fx-font-size: 16;"/>
-
-        <Hyperlink text="Zaten hesabın var mı? Giriş Yap" onAction="#openLogin"
-                   style="-fx-font-size: 12;"/>
-    </VBox>
+        <Label text="Kayıt Ol" styleClass="card-title"/> <TextField fx:id="txtFullName" promptText="Ad Soyad"
+                                                                    styleClass="form-input"/> <TextField fx:id="txtUsername" promptText="Kullanıcı Adı"
+                                                                                                         styleClass="form-input"/> <TextField fx:id="txtEmail" promptText="E-posta"
+                                                                                                                                              styleClass="form-input"/> <PasswordField fx:id="txtPassword" promptText="Şifre"
+                                                                                                                                                                                       styleClass="form-input"/> <Button text="Kayıt Ol" onAction="#registerClick"
+                                                                                                                                                                                                                         styleClass="register-button"/> <Hyperlink text="Zaten hesabın var mı? Giriş Yap" onAction="#openLogin"
+                                                                                                                                                                                                                                                                   styleClass="login-link"/> </VBox>
 </AnchorPane>
