@@ -2,36 +2,60 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.*?>
 <?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
 
 <?import java.net.URL?>
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.example.algo_proje.Controllers.LoginController"
-            prefWidth="800" prefHeight="500"
+            prefWidth="900" prefHeight="600"
             styleClass="root-pane"> <stylesheets>
     <URL value="@../Styles/login.css" />
 </stylesheets>
 
-    <VBox spacing="20" alignment="CENTER"
+    <HBox alignment="CENTER"
           AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
           AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0">
 
-        <VBox spacing="15" alignment="CENTER"
-              styleClass="login-card"  prefWidth="350">
+        <VBox styleClass="sidebar" prefWidth="450" alignment="CENTER" spacing="10">
+            <Label text="Hoş Geldiniz" styleClass="sidebar-title"/>
+            <Label text="Başlamak için giriş yapın." styleClass="sidebar-subtitle"/>
+        </VBox>
 
-            <Label text="Giriş Yap"
-                   styleClass="card-title"/> <TextField fx:id="txtUser" promptText="Kullanıcı adı veya e-posta"
-                                                        styleClass="form-input" /> <PasswordField fx:id="txtPassword" promptText="Şifre"
-                                                                                                  styleClass="form-input" /> <Button text="Giriş Yap"
-                                                                                                                                     onAction="#loginClick"
-                                                                                                                                     prefWidth="220"
-                                                                                                                                     styleClass="login-button" /> <Button text="Kayıt Ol"
-                                                                                                                                                                          onAction="#openRegister"
-                                                                                                                                                                          prefWidth="220"
-                                                                                                                                                                          styleClass="register-button" /> </VBox>
+        <VBox alignment="CENTER_LEFT" spacing="25"
+              styleClass="form-container" prefWidth="450">
 
-    </VBox>
+            <Label text="Giriş Yap" styleClass="card-title"/>
+
+            <VBox spacing="5">
+                <Label text="Kullanıcı Adı / E-posta" styleClass="form-label"/>
+                <TextField fx:id="txtUser" promptText="Kullanıcı adınızı giriniz"
+                           styleClass="form-input" />
+            </VBox>
+
+            <VBox spacing="5">
+                <Label text="Şifre" styleClass="form-label"/>
+                <PasswordField fx:id="txtPassword" promptText="Şifrenizi giriniz"
+                               styleClass="form-input" />
+                <Hyperlink text="Şifremi Unuttum?" styleClass="forgot-password-link"/>
+            </VBox>
+
+            <VBox spacing="10" alignment="CENTER">
+                <Button text="Giriş Yap"
+                        onAction="#loginClick"
+                        prefWidth="300"
+                        styleClass="primary-button" />
+
+                <Label text="veya" styleClass="separator-text"/>
+
+                <Button text="Kayıt Ol"
+                        onAction="#openRegister"
+                        prefWidth="300"
+                        styleClass="secondary-button" />
+            </VBox>
+        </VBox>
+
+    </HBox>
 
 </AnchorPane>

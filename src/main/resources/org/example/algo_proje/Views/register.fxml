@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
 
 <?import java.net.URL?>
-<AnchorPane prefHeight="500" prefWidth="700"
+<AnchorPane prefHeight="600" prefWidth="900"
             styleClass="root-pane" xmlns="http://javafx.com/javafx/23.0.1"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="org.example.algo_proje.Controllers.RegisterController">
@@ -15,16 +15,56 @@
         <URL value="@../Styles/register.css" />
     </stylesheets>
 
-    <VBox alignment="CENTER" spacing="12" prefWidth="380" layoutX="160" layoutY="65"
-          styleClass="register-card"> <padding>
-        <Insets top="30" right="30" bottom="30" left="30"/>
-    </padding>
+    <HBox alignment="CENTER"
+          AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+          AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0">
 
-        <Label text="Kayıt Ol" styleClass="card-title"/> <TextField fx:id="txtFullName" promptText="Ad Soyad"
-                                                                    styleClass="form-input"/> <TextField fx:id="txtUsername" promptText="Kullanıcı Adı"
-                                                                                                         styleClass="form-input"/> <TextField fx:id="txtEmail" promptText="E-posta"
-                                                                                                                                              styleClass="form-input"/> <PasswordField fx:id="txtPassword" promptText="Şifre"
-                                                                                                                                                                                       styleClass="form-input"/> <Button text="Kayıt Ol" onAction="#registerClick"
-                                                                                                                                                                                                                         styleClass="register-button"/> <Hyperlink text="Zaten hesabın var mı? Giriş Yap" onAction="#openLogin"
-                                                                                                                                                                                                                                                                   styleClass="login-link"/> </VBox>
+        <VBox styleClass="sidebar" prefWidth="450" alignment="CENTER" spacing="10">
+            <Label text="Ailemize Katılın" styleClass="sidebar-title"/>
+            <Label text="Hızlıca bir hesap oluşturun." styleClass="sidebar-subtitle"/>
+        </VBox>
+
+        <VBox alignment="CENTER_LEFT" spacing="20"
+              styleClass="form-container" prefWidth="450">
+
+            <Label text="Kayıt Ol" styleClass="card-title"/>
+
+            <VBox spacing="5">
+                <Label text="Ad Soyad" styleClass="form-label"/>
+                <TextField fx:id="txtFullName" promptText="Adınızı ve Soyadınızı giriniz"
+                           styleClass="form-input"/>
+            </VBox>
+
+            <VBox spacing="5">
+                <Label text="Kullanıcı Adı" styleClass="form-label"/>
+                <TextField fx:id="txtUsername" promptText="Kullanıcı adınızı belirleyiniz"
+                           styleClass="form-input"/>
+            </VBox>
+
+            <VBox spacing="5">
+                <Label text="E-posta" styleClass="form-label"/>
+                <TextField fx:id="txtEmail" promptText="Geçerli bir e-posta adresi"
+                           styleClass="form-input"/>
+            </VBox>
+
+            <VBox spacing="5">
+                <Label text="Şifre" styleClass="form-label"/>
+                <PasswordField fx:id="txtPassword" promptText="Güçlü bir şifre oluşturun"
+                               styleClass="form-input"/>
+            </VBox>
+
+            <VBox spacing="10" alignment="CENTER">
+                <Button text="Hesap Oluştur" onAction="#registerClick"
+                        prefWidth="300"
+                        styleClass="primary-button" />
+
+                <Label text="veya" styleClass="separator-text"/>
+
+                <Button text="Giriş Yap" onAction="#openLogin"
+                        prefWidth="300"
+                        styleClass="secondary-button" />
+            </VBox>
+
+        </VBox>
+    </HBox>
 </AnchorPane>

@@ -1,68 +1,113 @@
-/* register.css */
+/* register.css - Premium Tasarım (Login ile Uyumlu) */
 
-/* 1. Ana Kök Pencere Stili (AnchorPane) */
+/* Renk Paleti Tanımları */
 .root-pane {
-    /* Orijinal FXML'deki degrade arka plan: mor ve mavi tonları */
-    -fx-background-color: linear-gradient(to bottom right, #8e44ad, #3498db);
+    -primary-color: #4A90E2;      /* Mavi - Ana Buton Rengi */
+    -secondary-color: #9013FE;    /* Mor - Vurgu Rengi */
+    -background-light: #F4F7FC;   /* Açık Arka Plan */
+    -background-card: #FFFFFF;    /* Kart Arka Planı */
+    -text-dark: #333333;          /* Koyu Metin */
+    -text-light: #F4F7FC;         /* Açık Metin (Sidebar için) */
+
+    /* Tüm ekran için yumuşak, açık gri arka plan */
+    -fx-background-color: -background-light;
 }
 
-/* 2. Kayıt Kartı Stili (VBox) */
-.register-card {
-    /* Orijinal FXML'deki beyaz arka plan ve radius */
-    -fx-background-color: white;
-    -fx-background-radius: 20px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 15, 0, 0, 3); /* Hafif gölge ekleyelim */
+/* 1. SOL TARAF: Sidebar/Marka Alanı */
+.sidebar {
+    /* Login ekranındaki aynı degrade renkler */
+    -fx-background-color: linear-gradient(to top left, -primary-color, -secondary-color);
+    -fx-padding: 50px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 30, 0, 0, 0);
 }
 
-/* 3. Kart Başlığı Stili (Label) */
-.card-title {
-    /* Orijinal FXML'deki font boyutu ve kalınlık */
-    -fx-font-size: 24px;
+.sidebar-title {
+    -fx-font-size: 40px;
     -fx-font-weight: bold;
-    -fx-text-fill: #333333;
-    -fx-padding: 0 0 10px 0; /* Alttan biraz boşluk */
+    -fx-text-fill: -text-light;
+    -fx-opacity: 0.95;
 }
 
-/* 4. Giriş Alanları Stili (TextField, PasswordField) */
-.form-input {
-    /* Orijinal FXML'deki radius */
+.sidebar-subtitle {
+    -fx-font-size: 16px;
+    -fx-text-fill: -text-light;
+    -fx-opacity: 0.7;
+}
+
+/* 2. SAĞ TARAF: Form Alanı */
+.form-container {
+    -fx-background-color: -background-card;
+    -fx-padding: 40px 80px; /* Kayıt formunda daha çok alan olduğu için üst/alt dolguyu biraz azalttım */
     -fx-background-radius: 10px;
-    -fx-padding: 8px 10px;
-    -fx-border-color: #CCCCCC;
-    -fx-border-width: 1px;
-    -fx-border-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);
 }
 
-/* Input alanlarına odaklanıldığında stil */
+.card-title {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-dark;
+    -fx-padding: 0 0 10px 0;
+}
+
+/* 3. Giriş Elemanları Stili */
+.form-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+    -fx-text-fill: -text-dark;
+}
+
+.form-input {
+    -fx-background-color: #F0F0F0;
+    -fx-background-radius: 8px;
+    -fx-padding: 10px;
+    -fx-border-color: transparent;
+    -fx-border-width: 1px;
+    -fx-font-size: 14px;
+    -fx-pref-height: 38px;
+}
+
 .form-input:focused {
-    -fx-border-color: #8e44ad; /* Ana renk ile uyumlu */
+    -fx-background-color: -background-card;
+    -fx-border-color: -primary-color;
     -fx-border-width: 2px;
 }
 
-/* 5. Kayıt Ol Butonu Stili */
-.register-button {
-    /* Orijinal FXML'deki stil */
-    -fx-background-color: #8e44ad;
+/* 4. Butonlar */
+/* Ana (Kayıt Ol) Butonu */
+.primary-button {
+    -fx-background-color: -primary-color;
     -fx-text-fill: white;
     -fx-font-size: 16px;
+    -fx-font-weight: bold;
     -fx-background-radius: 10px;
-    -fx-padding: 10px 40px; /* Butonu biraz daha büyük yapalım */
-    -fx-pref-width: 200px;
+    -fx-padding: 12px 0px;
 }
 
-/* Buton üzerine gelindiğinde (Hover) */
-.register-button:hover {
-    -fx-background-color: #a366c3; /* Hafif açılmış renk */
+.primary-button:hover {
+    -fx-background-color: derive(-primary-color, 15%);
     -fx-cursor: hand;
 }
 
-/* 6. Giriş Bağlantısı Stili (Hyperlink) */
-.login-link {
-    /* Orijinal FXML'deki stil */
-    -fx-font-size: 12px;
-    -fx-text-fill: #3498db; /* Mavi tonu */
+/* İkincil (Giriş Yap) Butonu */
+.secondary-button {
+    -fx-background-color: transparent;
+    -fx-border-color: -primary-color;
+    -fx-border-width: 2px;
+    -fx-text-fill: -primary-color;
+    -fx-font-size: 16px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-padding: 12px 0px;
 }
 
-.login-link:hover {
-    -fx-underline: true;
+.secondary-button:hover {
+    -fx-background-color: rgba(74, 144, 226, 0.1);
+    -fx-cursor: hand;
+}
+
+/* Ayırıcı Metin */
+.separator-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: #999999;
+    -fx-font-style: italic;
 }
