@@ -5,6 +5,7 @@ module org.example.algo_proje {
     requires org.controlsfx.controls;
     requires org.kordamp.bootstrapfx.core;
     requires java.sql;
+    requires java.desktop;
 
     opens org.example.algo_proje to javafx.fxml;
     exports org.example.algo_proje;

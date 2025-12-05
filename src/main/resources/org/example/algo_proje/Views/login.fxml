@@ -1,14 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.example.algo_proje.Controllers.LoginController"
-            prefHeight="400.0" prefWidth="600.0">
+            prefWidth="800" prefHeight="500"
+            style="-fx-background-color: linear-gradient(to bottom right, #4A90E2, #9013FE);">
+
+    <!-- Ana Merkez Kutu -->
+    <VBox spacing="20" alignment="CENTER"
+          AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+          AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0">
+
+        <!-- Kart -->
+        <VBox spacing="15" alignment="CENTER"
+              style="-fx-background-color: white;
+                     -fx-padding: 40;
+                     -fx-background-radius: 20;
+                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 20, 0, 0, 5);"
+              prefWidth="350">
+
+            <Label text="Giriş Yap"
+                   style="-fx-font-size: 26px; -fx-font-weight: bold;"/>
+
+            <TextField fx:id="txtUser" promptText="Kullanıcı adı veya e-posta"
+                       style="-fx-background-radius: 10; -fx-padding: 10;" />
+
+            <PasswordField fx:id="txtPassword" promptText="Şifre"
+                           style="-fx-background-radius: 10; -fx-padding: 10;" />
+
+            <Button text="Giriş Yap"
+                    onAction="#loginClick"
+                    prefWidth="220"
+                    style="-fx-background-color: #4A90E2;
+                           -fx-text-fill: white;
+                           -fx-font-size: 16px;
+                           -fx-background-radius: 15;
+                           -fx-padding: 8;" />
+
+            <Button text="Kayıt Ol"
+                    onAction="#openRegister"
+                    prefWidth="220"
+                    style="-fx-background-color: transparent;
+                           -fx-border-color: #4A90E2;
+                           -fx-border-width: 2;
+                           -fx-text-fill: #4A90E2;
+                           -fx-font-size: 15px;
+                           -fx-background-radius: 15;
+                           -fx-border-radius: 15;
+                           -fx-padding: 8;" />
+        </VBox>
+
+    </VBox>
 
 </AnchorPane>
