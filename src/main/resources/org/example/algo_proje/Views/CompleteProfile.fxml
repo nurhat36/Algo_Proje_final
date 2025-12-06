@@ -2,48 +2,88 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.text.*?>
+<?import java.net.URL?>
 
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="org.example.algo_proje.Controllers.ProfileController"
-            prefHeight="500.0" prefWidth="600.0">
+            prefHeight="700.0" prefWidth="600.0"
+            styleClass="root-pane">
 
-    <VBox alignment="CENTER" spacing="15"
-          AnchorPane.leftAnchor="0"
-          AnchorPane.rightAnchor="0"
-          AnchorPane.topAnchor="0"
-          AnchorPane.bottomAnchor="0"
-          style="-fx-padding: 25; -fx-background-color: #f5f5f5;">
+    <stylesheets>
+        <URL value="@../Styles/profile.css" />
+    </stylesheets>
 
-        <Label text="Profilini Tamamla" style="-fx-font-size: 22;" />
+    <ScrollPane fitToWidth="true" styleClass="no-border-scrollpane"
+                AnchorPane.leftAnchor="0"
+                AnchorPane.rightAnchor="0"
+                AnchorPane.topAnchor="0"
+                AnchorPane.bottomAnchor="0">
 
-        <!-- Profil Fotoğrafı -->
-        <ImageView fx:id="profileImageView"
-                   fitHeight="120" fitWidth="120"
-                   preserveRatio="true"
-                   style="-fx-border-color: #444; -fx-border-radius: 10;" />
+        <VBox alignment="TOP_CENTER" spacing="20"
+              styleClass="profile-container-content">
 
-        <Button text="Profil Fotoğrafı Seç" fx:id="btnSelectImage" />
+            <padding>
+                <Insets top="30" right="30" bottom="30" left="30"/>
+            </padding>
 
-        <TextArea fx:id="txtBio" promptText="Biyografi"
-                  prefWidth="250" prefHeight="80"/>
+            <Label text="Profil Bilgilerini Tamamla" styleClass="header-title" />
 
-        <TextField fx:id="txtWebsite" promptText="Website" />
-        <TextField fx:id="txtPhone" promptText="Telefon" />
+            <HBox alignment="CENTER" spacing="40" styleClass="card">
+                <VBox alignment="CENTER" spacing="10">
+                    <ImageView fx:id="profileImageView"
+                               fitHeight="120" fitWidth="120"
+                               preserveRatio="true"
+                               styleClass="profile-image" />
 
-        <DatePicker fx:id="birthDatePicker"/>
+                    <Button text="Fotoğraf Seç" fx:id="btnSelectImage"
+                            styleClass="secondary-button" />
+                </VBox>
 
-        <ComboBox fx:id="genderBox" promptText="Cinsiyet" />
+                <VBox spacing="10" prefWidth="300">
+                    <Label text="Biyografi" styleClass="form-label"/>
+                    <TextArea fx:id="txtBio" promptText="Kendini kısaca tanıt..."
+                              prefHeight="80" styleClass="form-textarea"/>
+                </VBox>
+            </HBox>
 
-        <TextField fx:id="txtCountry" promptText="Ülke" />
-        <TextField fx:id="txtCity" promptText="Şehir" />
+            <VBox spacing="15" styleClass="card" prefWidth="500">
+                <Label text="Detaylı Bilgiler" styleClass="section-title"/>
 
-        <Button text="Kaydet" fx:id="btnSave"
-                style="-fx-background-color: #4CAF50; -fx-text-fill: white;" />
+                <GridPane hgap="15" vgap="15">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50.0" />
+                        <ColumnConstraints percentWidth="50.0" />
+                    </columnConstraints>
 
-    </VBox>
+                    <Label text="Website" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="form-label"/>
+                    <TextField fx:id="txtWebsite" promptText="Website Adresi" styleClass="form-input" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                    <Label text="Telefon" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="form-label"/>
+                    <TextField fx:id="txtPhone" promptText="+90 (XXX) XXX XX XX" styleClass="form-input" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                    <Label text="Doğum Tarihi" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="form-label"/>
+                    <DatePicker fx:id="birthDatePicker" styleClass="form-input" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                    <Label text="Cinsiyet" GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="form-label"/>
+                    <ComboBox fx:id="genderBox" promptText="Cinsiyet Seç" styleClass="form-input" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                    <Label text="Ülke" GridPane.columnIndex="0" GridPane.rowIndex="4" styleClass="form-label"/>
+                    <TextField fx:id="txtCountry" promptText="Yaşadığı Ülke" styleClass="form-input" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+
+                    <Label text="Şehir" GridPane.columnIndex="0" GridPane.rowIndex="5" styleClass="form-label"/>
+                    <TextField fx:id="txtCity" promptText="Yaşadığı Şehir" styleClass="form-input" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                </GridPane>
+            </VBox>
+
+            <Button text="Kaydet ve Bitir" fx:id="btnSave"
+                    styleClass="primary-button" prefWidth="250"/>
+
+        </VBox>
+
+    </ScrollPane>
 
 </AnchorPane>

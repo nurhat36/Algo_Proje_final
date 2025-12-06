@@ -21,7 +21,7 @@ public class Users {
 
     // Profil
     private String bio;
-    private byte[] profilePhoto;
+    private String profilePhoto;
     private byte[] coverPhoto;
     private String website;
     private String gender;
@@ -86,8 +86,8 @@ public class Users {
     public String getBio() { return bio; }
     public void setBio(String bio) { this.bio = bio; }
 
-    public byte[] getProfilePhoto() { return profilePhoto; }
-    public void setProfilePhoto(byte[] profilePhoto) { this.profilePhoto = profilePhoto; }
+    public String getProfilePhoto() { return profilePhoto; }
+    public void setProfilePhoto(String profilePhoto) { this.profilePhoto = profilePhoto; }
 
     public byte[] getCoverPhoto() { return coverPhoto; }
     public void setCoverPhoto(byte[] coverPhoto) { this.coverPhoto = coverPhoto; }

@@ -62,6 +62,7 @@ public class UserService {
         }
     }
 
+
     // Profil güncelleme
     public static boolean updateUserProfile(Users user) {
 
@@ -78,7 +79,7 @@ public class UserService {
             stmt.setDate(5, user.getBirthDate());
             stmt.setString(6, user.getCountry());
             stmt.setString(7, user.getCity());
-            stmt.setBytes(8, user.getProfilePhoto());
+            stmt.setString(8, user.getProfilePhoto());
             stmt.setInt(9, user.getUserId());
 
             int updated = stmt.executeUpdate();
@@ -138,7 +139,7 @@ public class UserService {
                 user.setCity(rs.getString("City"));
                 user.setCountry(rs.getString("Country"));
                 user.setBirthDate(rs.getDate("BirthDate"));
-                user.setProfilePhoto(rs.getBytes("ProfilePhoto"));
+                user.setProfilePhoto(rs.getString("ProfilePhoto"));
 
                 return user;
             }
@@ -172,7 +173,7 @@ public class UserService {
                 u.setCountry(rs.getString("country"));
                 u.setGender(rs.getString("gender"));
                 u.setBirthDate(rs.getDate("birthDate"));
-                u.setProfilePhoto(rs.getBytes("profilePhoto"));
+                u.setProfilePhoto(rs.getString("profilePhoto"));
 
                 return u;
             }

@@ -42,17 +42,23 @@ public class LoginController {
         Users loggedUser = UserService.getUserByUsername(txtUser.getText());
 
         try {
-            FXMLLoader loader = new FXMLLoader(LoginController.class.getResource("/org/example/algo_proje/Views/CompleteProfile.fxml"));
-
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/algo_proje/Views/CompleteProfile.fxml"));
             Parent root = loader.load();
 
-            // ProfileController’a kullanıcıyı gönder
             ProfileController controller = loader.getController();
             controller.setUser(loggedUser);
 
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.show();
+            // 2. Mevcut sahneyi al
+            Scene scene = ((Node) event.getSource()).getScene();
+            Stage stage = (Stage) scene.getWindow();
+
+            // 3. Sahneyi yeni içerikle değiştir
+            scene.setRoot(root);
+            // İsteğe bağlı: Pencerenin başlığını değiştir
+            stage.setTitle("Profil Tamamlama");
+            // İsteğe bağlı: Pencerenin boyutunu güncelle
+            stage.setWidth(600);
+            stage.setHeight(700);
 
         } catch (Exception e) {
             e.printStackTrace();

@@ -4,6 +4,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.control.*;
@@ -12,7 +14,9 @@ import org.example.algo_proje.Models.Users;
 import org.example.algo_proje.Services.UserService;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.sql.Date;
 
 public class ProfileController {
@@ -27,8 +31,11 @@ public class ProfileController {
     @FXML private ComboBox<String> genderBox;
     @FXML private TextField txtCountry;
     @FXML private TextField txtCity;
+    @FXML private ImageView profileImageView;
 
-    private byte[] selectedProfilePhoto;
+    // Controller alanları (Controller sınıfının en üstüne ekleyin)
+    private String selectedPhotoPath; // Veritabanına kaydedilecek benzersiz dosya adı
+    private File selectedFile;       // Geçici olarak seçilen dosya
 
     // Giriş yapmış kullanıcı
     private Users loggedUser;
@@ -72,12 +79,36 @@ public class ProfileController {
         }
 
         if (loggedUser.getProfilePhoto() != null) {
-            selectedProfilePhoto = loggedUser.getProfilePhoto();
+            selectedPhotoPath = loggedUser.getProfilePhoto();
+            loadProfileImage(selectedPhotoPath);
+        }
+    }
+    private void loadProfileImage(String uniqueFileName) {
+        if (uniqueFileName == null || uniqueFileName.isEmpty()) {
+            // Varsayılan fotoğrafı yükle
+            profileImageView.setImage(null); // Veya varsayılan bir Image nesnesi
+            return;
+        }
+
+        // JavaFX'te resources klasöründeki yolu yüklemek için ClassLoader kullanılır.
+        // Yolu şu formata çevirmeliyiz: "/static/profile_pics/a1b2c3d4.jpg"
+        String resourcePath = "/static/Images/profile_pics/" + uniqueFileName;
+
+        // Resim nesnesini oluştur
+        Image image = new Image(getClass().getResourceAsStream(resourcePath));
+
+        if (image.isError()) {
+            System.err.println("HATA: Kaynak dosya bulunamadı veya yüklenemedi: " + resourcePath);
+            // Varsayılan fotoğrafı yükle
+            profileImageView.setImage(null);
+        } else {
+            // ImageView'a yükle
+            profileImageView.setImage(image);
         }
     }
 
     /**
-     * Fotoğraf seçme işlemi
+     * Fotoğraf seçme işlemi: Kullanıcıdan dosyayı alır ve ekranda önizler.
      */
     private void selectImage() {
         FileChooser chooser = new FileChooser();
@@ -87,15 +118,66 @@ public class ProfileController {
                 new FileChooser.ExtensionFilter("Resim Dosyaları", "*.png", "*.jpg", "*.jpeg")
         );
 
-        File file = chooser.showOpenDialog(btnSelectImage.getScene().getWindow());
+        // Pencereyi aç ve dosya seçimi bekle
+        selectedFile = chooser.showOpenDialog(btnSelectImage.getScene().getWindow());
 
-        if (file != null) {
+        if (selectedFile != null) {
+            System.out.println("Fotoğraf seçildi: " + selectedFile.getName());
+
+            // Seçilen resmi ImageView'da önizle (ÖNEMLİ: Önizleme için dosya yolunu kullanır)
             try {
-                selectedProfilePhoto = Files.readAllBytes(file.toPath());
-                System.out.println("Fotoğraf seçildi: " + file.getName());
-            } catch (Exception ex) {
-                ex.printStackTrace();
+                Image image = new Image(selectedFile.toURI().toString());
+                profileImageView.setImage(image);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+        }
+    }
+    /**
+     * Seçilen resmi benzersiz bir isimle projenin statik klasörüne kaydeder
+     * ve veritabanına kaydedilecek dosya adını döndürür.
+     */
+    private String saveImageToStaticFolder() {
+        if (selectedFile == null) {
+            // Dosya seçilmemişse null veya varsayılan bir değer döndür
+            return null;
+        }
+
+        // 1. Dosya Uzantısını Al
+        String fileName = selectedFile.getName();
+        String extension = "";
+        int lastIndexOfDot = fileName.lastIndexOf('.');
+        if (lastIndexOfDot > 0) {
+            extension = fileName.substring(lastIndexOfDot);
+        }
+
+        // 2. Benzersiz Dosya Adı Oluştur (Örn: UUID kullanarak)
+        String uniqueID = java.util.UUID.randomUUID().toString();
+        String uniqueFileName = uniqueID + extension;
+
+        // 3. Hedef Klasörü Tanımla (Proje yapısına göre bu yolu ayarlamanız gerekebilir)
+        // Örnek: Projenin 'resources' klasöründeki 'static/profile_pics' klasörü
+        String staticFolderPath = "src/main/resource/static/Images/profile_pics/";
+        File targetDir = new File(staticFolderPath);
+
+        if (!targetDir.exists()) {
+            targetDir.mkdirs(); // Klasör yoksa oluştur
+        }
+
+        // 4. Dosyayı Hedefe Kopyala
+        File targetFile = new File(targetDir, uniqueFileName);
+
+        try {
+            Files.copy(selectedFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("Resim başarıyla kaydedildi: " + targetFile.getAbsolutePath());
+
+            // Veritabanına kaydedilecek benzersiz adı döndür
+            return uniqueFileName;
+
+        } catch (IOException e) {
+            System.err.println("Resim kaydetme hatası: " + e.getMessage());
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -103,6 +185,8 @@ public class ProfileController {
      * Profili veritabanına kaydetme
      */
     private void saveProfile() {
+        // 1. Resmi Kaydet ve Benzersiz Yolu Al
+        selectedPhotoPath = saveImageToStaticFolder();
 
         if (loggedUser == null) {
             System.out.println("HATA: loggedUser = null!");
@@ -123,7 +207,15 @@ public class ProfileController {
             loggedUser.setGender(genderBox.getValue());
         }
 
-        loggedUser.setProfilePhoto(selectedProfilePhoto);
+
+        if (selectedPhotoPath != null) {
+            loggedUser.setProfilePhoto(selectedPhotoPath);
+            // Kayıt başarılı: profile.setPhotoPath(selectedPhotoPath);
+            System.out.println("Veritabanına kaydedilen fotoğraf yolu: " + selectedPhotoPath);
+        } else {
+            // Kullanıcı fotoğraf seçmediyse veya kaydetme hatası oluştuysa
+            System.out.println("Fotoğraf seçilmedi veya kaydetme başarısız. Diğer bilgileri kaydet.");
+        }
 
         // PROFİL GÜNCELLE
         boolean ok = userService.updateUserProfile(loggedUser);
