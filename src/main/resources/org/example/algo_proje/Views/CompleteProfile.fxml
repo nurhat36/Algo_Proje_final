@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.algo_proje.Controllers.ProfileController"
+            prefHeight="500.0" prefWidth="600.0">
+
+    <VBox alignment="CENTER" spacing="15"
+          AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0"
+          AnchorPane.topAnchor="0"
+          AnchorPane.bottomAnchor="0"
+          style="-fx-padding: 25; -fx-background-color: #f5f5f5;">
+
+        <Label text="Profilini Tamamla" style="-fx-font-size: 22;" />
+
+        <!-- Profil Fotoğrafı -->
+        <ImageView fx:id="profileImageView"
+                   fitHeight="120" fitWidth="120"
+                   preserveRatio="true"
+                   style="-fx-border-color: #444; -fx-border-radius: 10;" />
+
+        <Button text="Profil Fotoğrafı Seç" fx:id="btnSelectImage" />
+
+        <TextArea fx:id="txtBio" promptText="Biyografi"
+                  prefWidth="250" prefHeight="80"/>
+
+        <TextField fx:id="txtWebsite" promptText="Website" />
+        <TextField fx:id="txtPhone" promptText="Telefon" />
+
+        <DatePicker fx:id="birthDatePicker"/>
+
+        <ComboBox fx:id="genderBox" promptText="Cinsiyet" />
+
+        <TextField fx:id="txtCountry" promptText="Ülke" />
+        <TextField fx:id="txtCity" promptText="Şehir" />
+
+        <Button text="Kaydet" fx:id="btnSave"
+                style="-fx-background-color: #4CAF50; -fx-text-fill: white;" />
+
+    </VBox>
+
+</AnchorPane>
