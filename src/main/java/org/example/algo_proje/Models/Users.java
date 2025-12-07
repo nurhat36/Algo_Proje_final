@@ -148,4 +148,6 @@ public class Users {
 
     public Date getDeletedAt() { return deletedAt; }
     public void setDeletedAt(Date deletedAt) { this.deletedAt = deletedAt; }
+
+
 }

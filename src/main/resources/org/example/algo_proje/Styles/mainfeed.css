@@ -1,0 +1,127 @@
+/* mainfeed.css - Ana Sayfa / Social Feed */
+
+.root-feed-pane {
+    -primary-color: #4A90E2;      /* Mavi - Ana Vurgu */
+    -secondary-color: #5CB85C;    /* Yeşil - Paylaş Butonu */
+    -background-light: #F4F7FC;   /* Açık Arka Plan */
+    -background-sidebar: #FFFFFF; /* Sidebar Arka Planı */
+    -text-dark: #333333;
+
+    -fx-background-color: -background-light;
+}
+
+/* 1. SOL SÜTUN: Navigasyon ve Profil */
+.sidebar-menu {
+    -fx-background-color: -background-sidebar;
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 0 1px 0 0;
+}
+
+.user-avatar {
+    -fx-background-color: #DDD;
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+    -fx-border-color: -primary-color;
+    -fx-border-width: 2px;
+}
+
+.user-name-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-dark;
+}
+
+.status-online {
+    -fx-font-size: 12px;
+    -fx-text-fill: -secondary-color;
+}
+
+/* Menü Butonları */
+.menu-button, .menu-button-active {
+    -fx-background-color: transparent;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 10 20;
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-dark;
+    -fx-background-radius: 8px;
+}
+
+.menu-button:hover {
+    -fx-background-color: rgba(74, 144, 226, 0.1);
+    -fx-cursor: hand;
+}
+
+.menu-button-active {
+    -fx-background-color: -primary-color;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.logout-button {
+    -fx-background-color: #F44336;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 10 0;
+}
+
+/* 2. SAĞ SÜTUN: Feed Alanı */
+.feed-area {
+    -fx-padding: 20px;
+    -fx-background-color: -background-light;
+}
+
+.feed-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-dark;
+    -fx-padding: 10 0;
+}
+
+/* Gönderi Oluşturma Kartı */
+.post-input-card {
+    -fx-background-color: -background-sidebar;
+    -fx-padding: 15px;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 2);
+    -fx-spacing: 10px;
+    -fx-margin: 0 0 20px 0;
+}
+
+.form-textarea {
+    -fx-background-color: #F8F8F8;
+    -fx-background-radius: 5px;
+    -fx-padding: 10px;
+    -fx-border-color: #DDD;
+}
+
+.media-button {
+    -fx-background-color: #9E9E9E;
+    -fx-text-fill: white;
+    -fx-background-radius: 5px;
+}
+
+.share-button {
+    -fx-background-color: -secondary-color;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 5px;
+}
+
+/* Paylaşım Akışı ve Tekil Kartlar */
+.feed-scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.feed-list {
+    -fx-padding: 0 10px 0 0; /* Scrollbar için sağdan boşluk bırakır */
+    -fx-background-color: transparent;
+}
+
+.post-card {
+    -fx-background-color: -background-sidebar;
+    -fx-padding: 20px;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 2);
+    -fx-pref-width: 700;
+}

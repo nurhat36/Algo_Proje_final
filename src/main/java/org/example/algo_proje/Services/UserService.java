@@ -90,6 +90,38 @@ public class UserService {
             return false;
         }
     }
+
+    // UserService.java (Örnek)
+
+    public static boolean isProfileComplete(Users user) {
+        // Kontrol edilecek zorunlu alanlar:
+        if (user == null) {
+            return false;
+        }
+
+        // 1. Biyografi zorunlu mu?
+        if (user.getBio() == null || user.getBio().trim().isEmpty()) {
+            return false;
+        }
+
+        // 2. Doğum tarihi zorunlu mu?
+        if (user.getBirthDate() == null) {
+            return false;
+        }
+
+        // 3. Telefon zorunlu mu?
+        if (user.getPhoneNumber() == null || user.getPhoneNumber().trim().isEmpty()) {
+            return false;
+        }
+
+        // Örnek: Ülke alanı da zorunlu olsun
+        if (user.getCountry() == null || user.getCountry().trim().isEmpty()) {
+            return false;
+        }
+
+        // Eğer tüm zorunlu alanlar doluysa
+        return true;
+    }
     public static int loginAndGetUserId(String username, String password) {
         try (Connection conn = Database.getConnection()) {
 

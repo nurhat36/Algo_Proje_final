@@ -12,6 +12,8 @@ import javafx.stage.Stage;
 import org.example.algo_proje.Models.Users;
 import org.example.algo_proje.Services.UserService;
 
+import java.io.IOException;
+
 public class LoginController {
 
     @FXML private TextField txtUser;
@@ -25,7 +27,7 @@ public class LoginController {
 
     @FXML
     public void loginClick(javafx.event.ActionEvent event) {
-
+        // 1. Giriş Kontrolü
         boolean ok = UserService.login(
                 txtUser.getText(),
                 txtPassword.getText()
@@ -33,37 +35,67 @@ public class LoginController {
 
         if (!ok) {
             System.out.println("Hatalı kullanıcı adı/şifre!");
+            // Kullanıcıya görsel bir hata mesajı göster (örn: Label veya Alert)
+            showAlert(Alert.AlertType.ERROR, "Giriş Hatası", "Kullanıcı adı veya şifre yanlış.");
             return;
         }
 
         System.out.println("Giriş başarılı!");
 
-        // kullanı bilgilerini çek
+        // 2. Kullanıcı Bilgilerini Çek
         Users loggedUser = UserService.getUserByUsername(txtUser.getText());
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/algo_proje/Views/CompleteProfile.fxml"));
-            Parent root = loader.load();
-
-            ProfileController controller = loader.getController();
-            controller.setUser(loggedUser);
-
-            // 2. Mevcut sahneyi al
-            Scene scene = ((Node) event.getSource()).getScene();
-            Stage stage = (Stage) scene.getWindow();
-
-            // 3. Sahneyi yeni içerikle değiştir
-            scene.setRoot(root);
-            // İsteğe bağlı: Pencerenin başlığını değiştir
-            stage.setTitle("Profil Tamamlama");
-            // İsteğe bağlı: Pencerenin boyutunu güncelle
-            stage.setWidth(600);
-            stage.setHeight(700);
+            // 3. Profil Durumu Kontrolü (Yeni Mantık)
+            if (UserService.isProfileComplete(loggedUser)) {
+                // Profil TAMAMLANMIŞSA: Ana Sayfaya (Paylaşımların olduğu sayfa) yönlendir
+                System.out.println("Profil tamamlanmış. Ana sayfaya yönlendiriliyor.");
+                loadMainPage(event, loggedUser);
+            } else {
+                // Profil TAMAMLANMAMIŞSA: CompleteProfile sayfasına yönlendir
+                System.out.println("Profil eksik. Tamamlama sayfasına yönlendiriliyor.");
+                loadCompleteProfilePage(event, loggedUser);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Hata", "Profil ekranı yüklenemedi!");
+            showAlert(Alert.AlertType.ERROR, "Hata", "Ekran yüklenirken bir sorun oluştu!");
         }
+    }
+    private void loadCompleteProfilePage(javafx.event.ActionEvent event, Users loggedUser) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/algo_proje/Views/CompleteProfile.fxml"));
+        Parent root = loader.load();
+
+        ProfileController controller = loader.getController();
+        controller.setUser(loggedUser); // Kullanıcı objesini ProfileController'a gönder
+
+        Scene scene = ((Node) event.getSource()).getScene();
+        Stage stage = (Stage) scene.getWindow();
+
+        scene.setRoot(root);
+        stage.setTitle("Profil Tamamlama");
+        stage.setWidth(600);
+        stage.setHeight(700);
+    }
+    // LoginController.java içindeki loadMainPage metodu (Güncellenmiş Hali)
+
+    private void loadMainPage(javafx.event.ActionEvent event, Users loggedUser) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/algo_proje/Views/MainFeedView.fxml"));
+        Parent root = loader.load();
+
+        // Controller'ı al
+        MainFeedController controller = loader.getController();
+
+        // Kullanıcı verisini gönder
+        controller.initData(loggedUser);
+
+        Scene scene = ((Node) event.getSource()).getScene();
+        Stage stage = (Stage) scene.getWindow();
+
+        scene.setRoot(root);
+        stage.setTitle("Ana Sayfa - Paylaşımlar");
+        stage.setWidth(1000);
+        stage.setHeight(800);
     }
 
     @FXML
