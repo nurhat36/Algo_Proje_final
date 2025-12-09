@@ -6,6 +6,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import org.example.algo_proje.Attribute.PhotoAttribute;
 import org.example.algo_proje.Models.Users;
 import org.example.algo_proje.Models.Shares;
 import org.example.algo_proje.Services.Database;
@@ -47,34 +48,45 @@ public class MainFeedController {
     }
 
     private void loadSidebarData() {
+        // 1. Kullanıcı Adı/Tam Adı yükle
         lblUserName.setText(
                 loggedUser.getFullName() != null && !loggedUser.getFullName().isEmpty()
                         ? loggedUser.getFullName()
                         : loggedUser.getUsername()
         );
 
-        // loggedUser.getProfilePhoto() modeline göre byte[] veya path olabilir —
-        // burada sadece gösterme amaçlı basit kontrol yapıyoruz.
-        try {
-            Object pf = null;
-            try {
-                // Eğer profil fotoğrafı byte[] ise
-                pf = loggedUser.getClass().getMethod("getProfilePhoto").invoke(loggedUser);
-            } catch (NoSuchMethodException ignore) { /* yoksa atla */ }
+        // 2. Profil Fotoğrafını yükle
+        String photoFileName = loggedUser.getProfilePhoto(); // Users modelinizdeki fotoğraf yolu get metodu
 
-            if (pf instanceof byte[]) {
-                byte[] data = (byte[]) pf;
-                if (data != null && data.length > 0) {
-                    Image img = new Image(new ByteArrayInputStream(data));
-                    userAvatar.setImage(img);
-                }
-            } else if (pf instanceof String) {
-                String path = (String) pf;
-                if (path != null && !path.isEmpty()) {
-                    try { userAvatar.setImage(new Image("file:" + path)); } catch (Exception ex){}
-                }
-            }
-        } catch (Exception ignored){}
+        if (photoFileName != null && !photoFileName.isEmpty()) {
+            loadProfileImage(photoFileName);
+        }
+    }
+
+    /**
+     * ImageManager kullanarak statik klasörden resmi yükler ve userAvatar'a atar.
+     * * @param uniqueFileName Veritabanında saklanan benzersiz dosya adı (Örn: "a1b2c3d4.jpg")
+     */
+    private void loadProfileImage(String uniqueFileName) {
+        if (uniqueFileName == null || uniqueFileName.isEmpty()) {
+            userAvatar.setImage(null); // Varsayılan resim de yüklenebilir
+            return;
+        }
+
+        // ImageManager'dan Image nesnesini al
+        // Yükleme sırasında kaynak yolu sabitini (PROFILE_RESOURCE_BASE_PATH) kullanıyoruz.
+        Image image = PhotoAttribute.loadImageFromResources(
+                uniqueFileName,
+                "/static/Images/profile_pics/",
+                getClass() // ClassLoader için mevcut Controller sınıfını gönderiyoruz
+        );
+
+        if (image != null) {
+            userAvatar.setImage(image);
+        } else {
+            System.err.println("Avatar yüklenemedi: " + uniqueFileName);
+            userAvatar.setImage(null); // Hata durumunda boş bırak
+        }
     }
 
 

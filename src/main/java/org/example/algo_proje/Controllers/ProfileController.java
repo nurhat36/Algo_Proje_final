@@ -10,6 +10,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.control.*;
 
+import org.example.algo_proje.Attribute.PhotoAttribute;
 import org.example.algo_proje.Models.Users;
 import org.example.algo_proje.Services.UserService;
 
@@ -85,25 +86,26 @@ public class ProfileController {
     }
     private void loadProfileImage(String uniqueFileName) {
         if (uniqueFileName == null || uniqueFileName.isEmpty()) {
-            // Varsayılan fotoğrafı yükle
-            profileImageView.setImage(null); // Veya varsayılan bir Image nesnesi
+            // Varsayılan fotoğrafı yükle (ya da boş bırak)
+            profileImageView.setImage(null);
             return;
         }
 
-        // JavaFX'te resources klasöründeki yolu yüklemek için ClassLoader kullanılır.
-        // Yolu şu formata çevirmeliyiz: "/static/profile_pics/a1b2c3d4.jpg"
-        String resourcePath = "/static/Images/profile_pics/" + uniqueFileName;
+        // GÜNCELLENDİ: ImageManager'ı kullanarak resmi yükle.
+        // Gerekli kaynak yolu sabitini (PROFILE_RESOURCE_BASE_PATH) parametre olarak gönderiyoruz.
+        Image image = PhotoAttribute.loadImageFromResources(
+                uniqueFileName,
+                "/static/Images/profile_pics/",
+                getClass() // ClassLoader için mevcut Controller sınıfını gönderiyoruz
+        );
 
-        // Resim nesnesini oluştur
-        Image image = new Image(getClass().getResourceAsStream(resourcePath));
-
-        if (image.isError()) {
-            System.err.println("HATA: Kaynak dosya bulunamadı veya yüklenemedi: " + resourcePath);
-            // Varsayılan fotoğrafı yükle
-            profileImageView.setImage(null);
-        } else {
-            // ImageView'a yükle
+        if (image != null) {
+            // Yükleme başarılı
             profileImageView.setImage(image);
+        } else {
+            // Hata veya bulunamadı durumunda
+            System.err.println("Profil fotoğrafı yüklenemedi: " + uniqueFileName);
+            profileImageView.setImage(null);
         }
     }
 
@@ -133,60 +135,17 @@ public class ProfileController {
             }
         }
     }
-    /**
-     * Seçilen resmi benzersiz bir isimle projenin statik klasörüne kaydeder
-     * ve veritabanına kaydedilecek dosya adını döndürür.
-     */
-    private String saveImageToStaticFolder() {
-        if (selectedFile == null) {
-            // Dosya seçilmemişse null veya varsayılan bir değer döndür
-            return null;
-        }
 
-        // 1. Dosya Uzantısını Al
-        String fileName = selectedFile.getName();
-        String extension = "";
-        int lastIndexOfDot = fileName.lastIndexOf('.');
-        if (lastIndexOfDot > 0) {
-            extension = fileName.substring(lastIndexOfDot);
-        }
-
-        // 2. Benzersiz Dosya Adı Oluştur (Örn: UUID kullanarak)
-        String uniqueID = java.util.UUID.randomUUID().toString();
-        String uniqueFileName = uniqueID + extension;
-
-        // 3. Hedef Klasörü Tanımla (Proje yapısına göre bu yolu ayarlamanız gerekebilir)
-        // Örnek: Projenin 'resources' klasöründeki 'static/profile_pics' klasörü
-        String staticFolderPath = "src/main/resource/static/Images/profile_pics/";
-        File targetDir = new File(staticFolderPath);
-
-        if (!targetDir.exists()) {
-            targetDir.mkdirs(); // Klasör yoksa oluştur
-        }
-
-        // 4. Dosyayı Hedefe Kopyala
-        File targetFile = new File(targetDir, uniqueFileName);
-
-        try {
-            Files.copy(selectedFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            System.out.println("Resim başarıyla kaydedildi: " + targetFile.getAbsolutePath());
-
-            // Veritabanına kaydedilecek benzersiz adı döndür
-            return uniqueFileName;
-
-        } catch (IOException e) {
-            System.err.println("Resim kaydetme hatası: " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
-    }
 
     /**
      * Profili veritabanına kaydetme
      */
     private void saveProfile() {
         // 1. Resmi Kaydet ve Benzersiz Yolu Al
-        selectedPhotoPath = saveImageToStaticFolder();
+        selectedPhotoPath = PhotoAttribute.saveImageToStaticFolder(
+                selectedFile,
+                "src/main/resources/static/Images/profile_pics/" // Dinamik kayıt yolu sabitini gönder
+        );
 
         if (loggedUser == null) {
             System.out.println("HATA: loggedUser = null!");
