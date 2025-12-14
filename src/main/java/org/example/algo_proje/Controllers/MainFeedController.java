@@ -10,8 +10,10 @@ import org.example.algo_proje.Attribute.PhotoAttribute;
 import org.example.algo_proje.Models.Users;
 import org.example.algo_proje.Models.Shares;
 import org.example.algo_proje.Services.Database;
+import org.example.algo_proje.Services.ShareService;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,6 +95,9 @@ public class MainFeedController {
 
     // ------------------ PAYLAŞIM EKLEME ------------------
 
+    // MainFeedController.java
+    private File selectedShareFile = null;
+    private final ShareService shareService = new ShareService();
     private void onAddPhotoClick() {
         javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
         fileChooser.setTitle("Fotoğraf Seç");
@@ -101,55 +106,60 @@ public class MainFeedController {
         );
 
         java.io.File file = fileChooser.showOpenDialog(btnAddPhoto.getScene().getWindow());
+
         if (file != null) {
-            selectedPhotoPath = file.getAbsolutePath();
-            showAlert("Fotoğraf seçildi: " + selectedPhotoPath);
+            selectedShareFile = file; // Dosya nesnesini tut
+            showAlert("Fotoğraf seçildi: " + file.getName());
         } else {
-            selectedPhotoPath = null;
+            selectedShareFile = null;
         }
     }
 
+    // MainFeedController.java
+
     private void onShareButtonClick() {
         String text = txtShareContent.getText() == null ? "" : txtShareContent.getText().trim();
-        if (text.isEmpty() && selectedPhotoPath == null) {
+        if (text.isEmpty() && selectedShareFile == null) { // selectedShareFile kontrolü
             showAlert("Boş paylaşım gönderemezsin.");
             return;
         }
 
+        String savedImagePath = null;
+
+        // --- 1. GÖRSELİ STATİK KLASÖRE TAŞIMA (PhotoAttribute Kullanımı) ---
+        if (selectedShareFile != null) {
+            // PhotoAttribute'ı kullanarak resmi static klasöre kaydet
+            savedImagePath = PhotoAttribute.saveImageToStaticFolder(selectedShareFile, "src/main/resources/static/Images/Shares_Pics/");
+
+            if (savedImagePath == null) {
+                showAlert("Resim kaydedilirken hata oluştu. Paylaşım yapılamadı.");
+                return;
+            }
+        }
+
+        // --- 2. PAYLAŞIM NESNESİNİ OLUŞTURMA ---
         Shares share = new Shares();
         share.setUserId(loggedUser.getUserId());
         share.setTitle(null);
         share.setDescription(text);
-        share.setPath(selectedPhotoPath);
-        share.setImage(selectedPhotoPath != null);
+        share.setPath(savedImagePath); // Artık benzersiz dosya adı var
+        share.setImage(savedImagePath != null);
 
-        boolean ok = saveShareToDatabase(share);
+        // --- 3. SERVİS İLE VERİTABANINA KAYDETME ---
+        // ShareService'in insertShare metodunu kullanıyoruz
+        boolean ok = shareService.addShare(share);
+
         if (ok) {
             txtShareContent.clear();
-            selectedPhotoPath = null;
-            loadFeedPostsFromDatabase();
+            selectedShareFile = null; // Dosyayı temizle
+            loadFeedPostsFromDatabase(); // Akışı yenile
+            // Yeni eklenen postun hemen üstte görünmesi gerekir
         } else {
             showAlert("Paylaşım kaydedilirken hata oluştu.");
         }
     }
 
-    private boolean saveShareToDatabase(Shares share) {
-        String sql = "INSERT INTO Shares (UserId, Title, Description, Path, IsImage, CreatedAt) VALUES (?, ?, ?, ?, ?, GETDATE())";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, share.getUserId());
-            ps.setString(2, share.getTitle());
-            ps.setString(3, share.getDescription());
-            ps.setString(4, share.getPath());
-            ps.setBoolean(5, share.isImage());
-
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 
     private void loadFeedPostsFromDatabase() {
         feedContainer.getChildren().clear();
@@ -241,7 +251,12 @@ public class MainFeedController {
 
         if (p.isImage && p.path != null && !p.path.isEmpty()) {
             try {
-                Image iv = new Image("file:" + p.path, 640, 0, true, true);
+                Image iv = PhotoAttribute.loadImageFromResources(
+                        p.path,
+                        "/static/Images/Shares_Pics/",
+                        getClass() // ClassLoader için mevcut Controller sınıfını gönderiyoruz
+                );
+
                 ImageView iview = new ImageView(iv);
                 iview.setPreserveRatio(true);
                 iview.setFitWidth(640);
