@@ -1,43 +1,52 @@
 package org.example.algo_proje.Controllers;
 
-import javafx.geometry.Insets;
-import javafx.scene.Cursor;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import org.example.algo_proje.Attribute.PhotoAttribute;
 import org.example.algo_proje.Models.Users;
-import org.example.algo_proje.Models.Shares;
-import org.example.algo_proje.Services.Database;
-import org.example.algo_proje.Services.ShareService;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
 
 public class MainFeedController {
 
-    // SIDEBAR
-    public ImageView userAvatar;
-    public Label lblUserName;
+    // SIDEBAR FXML
+    @FXML public ImageView userAvatar;
+    @FXML public Label lblUserName;
+    @FXML public Button btnHome;
+    @FXML public Button btnExplore;
+    @FXML public Button btnNotifications;
+    @FXML public Button btnSettings;
+    @FXML public Button btnLogout;
 
-    // FEED
-    public VBox feedContainer;
-
-    // PAYLAŞIM GİRİŞİ
-    public TextArea txtShareContent;
-    public Button btnShare;
-    public Button btnAddPhoto;
+    // DYNAMIC CONTENT AREA
+    @FXML public VBox centerContentArea; // Orta alanın VBox'ı
 
     private Users loggedUser;
-    private String selectedPhotoPath = null;
 
+    @FXML
     public void initialize() {
-        btnShare.setOnAction(e -> onShareButtonClick());
-        btnAddPhoto.setOnAction(e -> onAddPhotoClick());
+        // Butonlara aksiyonları bağlama
+        btnHome.setOnAction(e -> loadCenterContent("/org/example/algo_proje/Views/FeedContent.fxml"));
+
+        // Örnek: Keşfet butonu için (Ayrı bir FXML ve Controller olmalı)
+        btnExplore.setOnAction(e -> {
+            // Örnek: Keşfet FXML yolu
+            loadCenterContent("/org/example/algo_proje/Views/ExploreContent.fxml");
+
+        });
+
+        // Çıkış yap butonu için örnek bir aksiyon:
+        btnLogout.setOnAction(e -> {
+            // Çıkış yapma veya login ekranına dönme mantığı buraya gelir
+            showAlert("Oturum Kapatıldı.");
+            // Stage'i kapatma, vb.
+        });
     }
 
     // LoginController'dan çağrılacak
@@ -45,362 +54,88 @@ public class MainFeedController {
         this.loggedUser = user;
         if (loggedUser != null) {
             loadSidebarData();
-            loadFeedPostsFromDatabase();
+            // Uygulama açılışında Anasayfa içeriğini yükle
+            loadCenterContent("/org/example/algo_proje/Views/FeedContent.fxml");
         }
     }
 
     private void loadSidebarData() {
-        // 1. Kullanıcı Adı/Tam Adı yükle
+        // Kullanıcı Adı/Tam Adı yükle
         lblUserName.setText(
                 loggedUser.getFullName() != null && !loggedUser.getFullName().isEmpty()
                         ? loggedUser.getFullName()
                         : loggedUser.getUsername()
         );
 
-        // 2. Profil Fotoğrafını yükle
-        String photoFileName = loggedUser.getProfilePhoto(); // Users modelinizdeki fotoğraf yolu get metodu
-
+        // Profil Fotoğrafını yükle (Mevcut loadProfileImage metodu bu kontrolcüde kalmalı)
+        String photoFileName = loggedUser.getProfilePhoto();
         if (photoFileName != null && !photoFileName.isEmpty()) {
             loadProfileImage(photoFileName);
         }
     }
 
-    /**
-     * ImageManager kullanarak statik klasörden resmi yükler ve userAvatar'a atar.
-     * * @param uniqueFileName Veritabanında saklanan benzersiz dosya adı (Örn: "a1b2c3d4.jpg")
-     */
+    // ... loadProfileImage metodu buraya taşınabilir veya ayrı bir Manager sınıfında kalabilir.
     private void loadProfileImage(String uniqueFileName) {
+        // Fotoğraf yükleme mantığı
         if (uniqueFileName == null || uniqueFileName.isEmpty()) {
-            userAvatar.setImage(null); // Varsayılan resim de yüklenebilir
+            userAvatar.setImage(null);
             return;
         }
 
-        // ImageManager'dan Image nesnesini al
-        // Yükleme sırasında kaynak yolu sabitini (PROFILE_RESOURCE_BASE_PATH) kullanıyoruz.
         Image image = PhotoAttribute.loadImageFromResources(
                 uniqueFileName,
                 "/static/Images/profile_pics/",
-                getClass() // ClassLoader için mevcut Controller sınıfını gönderiyoruz
+                getClass()
         );
 
         if (image != null) {
             userAvatar.setImage(image);
         } else {
             System.err.println("Avatar yüklenemedi: " + uniqueFileName);
-            userAvatar.setImage(null); // Hata durumunda boş bırak
+            userAvatar.setImage(null);
         }
     }
+    // ...
 
+    /**
+     * Orta alanı temizler ve belirtilen FXML içeriğini yükler.
+     * @param fxmlPath Yüklenecek FXML dosyasının kaynak yolu.
+     */
+    private void loadCenterContent(String fxmlPath) {
+        centerContentArea.getChildren().clear(); // Önceki içeriği temizle
 
-
-    // ------------------ PAYLAŞIM EKLEME ------------------
-
-    // MainFeedController.java
-    private File selectedShareFile = null;
-    private final ShareService shareService = new ShareService();
-    private void onAddPhotoClick() {
-        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
-        fileChooser.setTitle("Fotoğraf Seç");
-        fileChooser.getExtensionFilters().add(
-                new javafx.stage.FileChooser.ExtensionFilter("Resim Dosyaları", "*.png", "*.jpg", "*.jpeg")
-        );
-
-        java.io.File file = fileChooser.showOpenDialog(btnAddPhoto.getScene().getWindow());
-
-        if (file != null) {
-            selectedShareFile = file; // Dosya nesnesini tut
-            showAlert("Fotoğraf seçildi: " + file.getName());
-        } else {
-            selectedShareFile = null;
-        }
-    }
-
-    // MainFeedController.java
-
-    private void onShareButtonClick() {
-        String text = txtShareContent.getText() == null ? "" : txtShareContent.getText().trim();
-        if (text.isEmpty() && selectedShareFile == null) { // selectedShareFile kontrolü
-            showAlert("Boş paylaşım gönderemezsin.");
-            return;
-        }
-
-        String savedImagePath = null;
-
-        // --- 1. GÖRSELİ STATİK KLASÖRE TAŞIMA (PhotoAttribute Kullanımı) ---
-        if (selectedShareFile != null) {
-            // PhotoAttribute'ı kullanarak resmi static klasöre kaydet
-            savedImagePath = PhotoAttribute.saveImageToStaticFolder(selectedShareFile, "src/main/resources/static/Images/Shares_Pics/");
-
-            if (savedImagePath == null) {
-                showAlert("Resim kaydedilirken hata oluştu. Paylaşım yapılamadı.");
-                return;
-            }
-        }
-
-        // --- 2. PAYLAŞIM NESNESİNİ OLUŞTURMA ---
-        Shares share = new Shares();
-        share.setUserId(loggedUser.getUserId());
-        share.setTitle(null);
-        share.setDescription(text);
-        share.setPath(savedImagePath); // Artık benzersiz dosya adı var
-        share.setImage(savedImagePath != null);
-
-        // --- 3. SERVİS İLE VERİTABANINA KAYDETME ---
-        // ShareService'in insertShare metodunu kullanıyoruz
-        boolean ok = shareService.addShare(share);
-
-        if (ok) {
-            txtShareContent.clear();
-            selectedShareFile = null; // Dosyayı temizle
-            loadFeedPostsFromDatabase(); // Akışı yenile
-            // Yeni eklenen postun hemen üstte görünmesi gerekir
-        } else {
-            showAlert("Paylaşım kaydedilirken hata oluştu.");
-        }
-    }
-
-
-
-    private void loadFeedPostsFromDatabase() {
-        feedContainer.getChildren().clear();
-
-        List<PostDTO> posts = new ArrayList<>();
-
-        String sql = """
-                SELECT s.Id, s.UserId AS ShareUserId, s.Description, s.Path, s.IsImage, s.CreatedAt,
-                       u.UserId AS UserId, u.Username, u.FullName, u.ProfilePhoto
-                FROM Shares s
-                JOIN Users u ON u.UserId = s.UserId
-                WHERE ISNULL(s.IsDeleted,0) = 0
-                ORDER BY s.CreatedAt DESC
-                """;
-
-        try (Connection conn = Database.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                PostDTO dto = new PostDTO();
-                dto.shareId = rs.getInt("Id");
-                dto.shareUserId = rs.getInt("ShareUserId");
-                dto.description = rs.getString("Description");
-                dto.path = rs.getString("Path");
-                dto.isImage = rs.getBoolean("IsImage");
-                dto.createdAt = rs.getTimestamp("CreatedAt");
-
-                dto.authorUserId = rs.getInt("UserId");
-                dto.authorUsername = rs.getString("Username");
-                dto.authorFullName = rs.getString("FullName");
-
-                // profile photo: try bytes first
-                byte[] avatarBytes = null;
-                try { avatarBytes = rs.getBytes("ProfilePhoto"); } catch (Exception ignored) {}
-                dto.authorAvatarBytes = avatarBytes;
-
-                posts.add(dto);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            showAlert("Paylaşımlar yüklenirken hata: " + e.getMessage());
-            return;
-        }
-
-        for (PostDTO p : posts) {
-            feedContainer.getChildren().add(buildPostCard(p));
-        }
-    }
-    private VBox buildPostCard(PostDTO p) {
-        // Outer card
-        VBox card = new VBox();
-        card.setSpacing(8);
-        card.setPadding(new Insets(12));
-        card.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0, 0, 2);");
-
-        // Header: avatar + name + time
-        HBox header = new HBox();
-        header.setSpacing(10);
-        header.setPadding(new Insets(4, 0, 4, 0));
-
-        ImageView avatar = new ImageView();
-        avatar.setFitWidth(44);
-        avatar.setFitHeight(44);
-        avatar.setPreserveRatio(true);
-        avatar.setSmooth(true);
-        Image avatarImage = getAvatarImage(p.authorAvatarBytes, p.path /* fallback - not ideal */);
-        if (avatarImage != null) avatar.setImage(avatarImage);
-        else avatar.setImage(new Image(getClass().getResourceAsStream("/static/Images/profile_pics/default.png"))); // ensure default exists
-
-        VBox nameBox = new VBox();
-        Label nameLbl = new Label(p.authorFullName != null && !p.authorFullName.isEmpty() ? p.authorFullName : p.authorUsername);
-        nameLbl.setStyle("-fx-font-weight: 600; -fx-font-size: 13;");
-        Label timeLbl = new Label(p.createdAt != null ? p.createdAt.toString() : "");
-        timeLbl.setStyle("-fx-font-size: 11; -fx-text-fill: #777777;");
-        nameBox.getChildren().addAll(nameLbl, timeLbl);
-
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-
-        header.getChildren().addAll(avatar, nameBox, spacer);
-
-        Label contentLbl = new Label(p.description == null ? "" : p.description);
-        contentLbl.setWrapText(true);
-        contentLbl.setStyle("-fx-font-size: 13;");
-
-        card.getChildren().addAll(header, contentLbl);
-
-        if (p.isImage && p.path != null && !p.path.isEmpty()) {
-            try {
-                Image iv = PhotoAttribute.loadImageFromResources(
-                        p.path,
-                        "/static/Images/Shares_Pics/",
-                        getClass() // ClassLoader için mevcut Controller sınıfını gönderiyoruz
-                );
-
-                ImageView iview = new ImageView(iv);
-                iview.setPreserveRatio(true);
-                iview.setFitWidth(640);
-                iview.setStyle("-fx-background-radius: 8;");
-                VBox.setMargin(iview, new Insets(6, 0, 0, 0));
-                card.getChildren().add(iview);
-            } catch (Exception ex) {
-                // swallow
-            }
-        }
-
-        HBox actions = new HBox();
-        actions.setSpacing(12);
-        actions.setPadding(new Insets(8, 0, 0, 0));
-
-        int currentLikeCount = getLikeCount(p.shareId);
-        Button btnLike = new Button("❤ " + currentLikeCount);
-        btnLike.setCursor(Cursor.HAND);
-
-        btnLike.setStyle("-fx-background-radius: 6; -fx-padding: 6 10;");
-
-        boolean alreadyLiked = checkIfUserLiked(p.shareId, loggedUser.getUserId());
-        if (alreadyLiked) btnLike.setStyle(btnLike.getStyle() + "-fx-background-color: rgba(255,0,0,0.08);");
-
-        btnLike.setOnAction(evt -> {
-            boolean nowLiked = toggleLike(p.shareId, loggedUser.getUserId());
-            int newCount = getLikeCount(p.shareId);
-            btnLike.setText("❤ " + newCount);
-            if (nowLiked) btnLike.setStyle(btnLike.getStyle() + "-fx-background-color: rgba(255,0,0,0.08);");
-            else btnLike.setStyle("-fx-background-radius: 6; -fx-padding: 6 10;");
-        });
-
-        Button btnLikers = new Button("Kimler beğendi");
-        btnLikers.setOnAction(evt -> {
-            List<String> likers = getLikersNames(p.shareId);
-            Alert a = new Alert(Alert.AlertType.INFORMATION);
-            a.setHeaderText("Beğenenler");
-            a.setContentText(likers.isEmpty() ? "Henüz kimse beğenmedi." : String.join("\n", likers));
-            a.showAndWait();
-        });
-
-        actions.getChildren().addAll(btnLike, btnLikers);
-        card.getChildren().add(actions);
-
-        return card;
-    }
-
-    private Image getAvatarImage(byte[] avatarBytes, String fallbackPath) {
         try {
-            if (avatarBytes != null && avatarBytes.length > 0) {
-                return new Image(new ByteArrayInputStream(avatarBytes));
-            }
-        } catch (Exception ignored) {}
-        try {
-            if (fallbackPath != null && !fallbackPath.isEmpty()) {
-                return new Image("file:" + fallbackPath, 44, 44, true, true);
-            }
-        } catch (Exception ignored) {}
-        return null;
-    }
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent content = loader.load();
 
-    private int getLikeCount(int shareId) {
-        String sql = "SELECT COUNT(*) AS c FROM Likes WHERE ShareId = ?";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, shareId);
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) return rs.getInt("c");
+            // Yeni içeriği VBox'a ekle ve genişlemesini sağla
+            centerContentArea.getChildren().add(content);
+            VBox.setVgrow(content, Priority.ALWAYS);
+
+            // Controller'a eriş ve kullanıcı bilgisini aktar
+            Object controller = loader.getController();
+
+            // Kontrolcü Tipine göre ayarları yap
+            if (controller instanceof FeedContentController) {
+                FeedContentController feedController = (FeedContentController) controller;
+                // Kullanıcı verisini Feed Controller'a aktar
+                feedController.setLoggedUser(loggedUser);
             }
-        } catch (Exception e) { e.printStackTrace(); }
-        return 0;
-    }
+            if (controller instanceof ExploreContentController) {
+                ExploreContentController exploreController = (ExploreContentController) controller;
 
-    private boolean checkIfUserLiked(int shareId, int userId) {
-        String sql = "SELECT 1 FROM Likes WHERE ShareId = ? AND UserId = ?";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, shareId);
-            ps.setInt(2, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
+                // 3. Kullanıcı verisi aktarılır (İşte burası çağrı noktası!)
+                exploreController.setLoggedUser(loggedUser);
             }
-        } catch (Exception e) { e.printStackTrace(); }
-        return false;
-    }
+            // Keşfet için de aynı mantık uygulanabilir:
+            // else if (controller instanceof ExploreContentController) {
+            //     ((ExploreContentController) controller).setLoggedUser(loggedUser);
+            // }
 
-
-    private boolean toggleLike(int shareId, int userId) {
-        try (Connection conn = Database.getConnection()) {
-            String check = "SELECT 1 FROM Likes WHERE ShareId = ? AND UserId = ?";
-            try (PreparedStatement ps = conn.prepareStatement(check)) {
-                ps.setInt(1, shareId);
-                ps.setInt(2, userId);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        // already liked -> remove
-                        String del = "DELETE FROM Likes WHERE ShareId = ? AND UserId = ?";
-                        try (PreparedStatement delSt = conn.prepareStatement(del)) {
-                            delSt.setInt(1, shareId);
-                            delSt.setInt(2, userId);
-                            delSt.executeUpdate();
-                        }
-                        return false;
-                    }
-                }
-            }
-
-            String insert = "INSERT INTO Likes (ShareId, UserId, LikedAt) VALUES (?, ?, GETDATE())";
-            try (PreparedStatement ins = conn.prepareStatement(insert)) {
-                ins.setInt(1, shareId);
-                ins.setInt(2, userId);
-                ins.executeUpdate();
-                return true;
-            }
-
-        } catch (SQLIntegrityConstraintViolationException dup) {
-            return false;
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
-            return false;
+            showAlert("İçerik yüklenirken hata oluştu: " + fxmlPath + "\nLütfen dosya yolunu kontrol edin.");
         }
-    }
-
-    private List<String> getLikersNames(int shareId) {
-        List<String> list = new ArrayList<>();
-        String sql = """
-                SELECT u.UserId, u.Username, u.FullName
-                FROM Likes l
-                JOIN Users u ON u.UserId = l.UserId
-                WHERE l.ShareId = ?
-                ORDER BY l.LikedAt DESC
-                """;
-        try (Connection conn = Database.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, shareId);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    String name = rs.getString("FullName");
-                    if (name == null || name.isEmpty()) name = rs.getString("Username");
-                    list.add(name);
-                }
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-        return list;
     }
 
     private void showAlert(String msg) {
@@ -408,19 +143,5 @@ public class MainFeedController {
         a.setHeaderText(null);
         a.setContentText(msg);
         a.showAndWait();
-    }
-
-    private static class PostDTO {
-        int shareId;
-        int shareUserId;
-        String description;
-        String path;
-        boolean isImage;
-        Timestamp createdAt;
-
-        int authorUserId;
-        String authorUsername;
-        String authorFullName;
-        byte[] authorAvatarBytes;
     }
 }

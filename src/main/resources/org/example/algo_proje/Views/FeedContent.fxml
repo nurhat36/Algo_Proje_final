@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="feedRoot"
+      styleClass="feed-area"
+      xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.algo_proje.Controllers.FeedContentController">
+
+    <VBox styleClass="post-input-card">
+        <TextArea fx:id="txtShareContent"
+                  prefHeight="60"
+                  promptText="Ne düşünüyorsun?"
+                  styleClass="form-textarea"/>
+
+        <HBox alignment="CENTER_RIGHT" spacing="10">
+            <Button fx:id="btnAddPhoto" styleClass="media-button" text="Fotoğraf Ekle"/>
+            <Button fx:id="btnShare" styleClass="share-button" text="Paylaş"/>
+        </HBox>
+    </VBox>
+
+    <Label styleClass="feed-title" text="Son Paylaşımlar"/>
+
+    <ScrollPane fitToWidth="true" styleClass="feed-scroll-pane" VBox.vgrow="ALWAYS">
+        <VBox fx:id="feedContainer" spacing="15" styleClass="feed-list"/>
+    </ScrollPane>
+</VBox>

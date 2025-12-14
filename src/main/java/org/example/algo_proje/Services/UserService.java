@@ -4,6 +4,8 @@ import org.example.algo_proje.Models.Users;
 import org.example.algo_proje.utils.Security;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserService {
 
@@ -216,5 +218,41 @@ public class UserService {
 
         return null;
     }
+    public static List<Users> getAllUsersExcept(int userId) {
+        List<Users> users = new ArrayList<>();
+        String sql = "SELECT * FROM Users WHERE UserId != ?";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Users u = new Users();
+                // Buradaki doldurma işlemi diğer metotlarla tutarlı olmalıdır
+                u.setUserId(rs.getInt("userId"));
+                u.setFullName(rs.getString("fullName"));
+                u.setUsername(rs.getString("username"));
+                u.setEmail(rs.getString("email"));
+                u.setBio(rs.getString("bio"));
+                u.setWebsite(rs.getString("website"));
+                u.setPhoneNumber(rs.getString("phoneNumber"));
+                u.setCity(rs.getString("city"));
+                u.setCountry(rs.getString("country"));
+                u.setGender(rs.getString("gender"));
+                u.setBirthDate(rs.getDate("birthDate"));
+                u.setProfilePhoto(rs.getString("profilePhoto"));
+
+                users.add(u);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return users;
+    }
+
 
 }
