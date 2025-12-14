@@ -44,12 +44,21 @@ public class RelationService {
             ps.setInt(4, TYPE_NORMAL_FRIEND); // Varsayılan: Normal arkadaş
 
             int affectedRows = ps.executeUpdate();
+            boolean relationOk = affectedRows > 0;
+
+            if (relationOk) {
+                // İLİŞKİ BAŞARILI KURULDUYSA BİLDİRİM OLUŞTUR
+                String notificationContent = UserService.getUserById(senderId).getUsername() + " size arkadaşlık isteği gönderdi.";
+                NotificationService.createNotification(receiverId, senderId, 1 /* FriendRequest */, notificationContent);
+            }
             return affectedRows > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
+
+
     }
 
     /**
@@ -185,4 +194,12 @@ public class RelationService {
         }
         return friends;
     }
+
+
+
+    // RelationService.java içerisine eklenecek metot (veya NotificationService'e)
+
+
+
+
 }

@@ -40,6 +40,7 @@ public class MainFeedController {
             loadCenterContent("/org/example/algo_proje/Views/ExploreContent.fxml");
 
         });
+        btnNotifications.setOnAction(e -> loadCenterContent("/org/example/algo_proje/Views/NotificationsContent.fxml"));
 
         // Çıkış yap butonu için örnek bir aksiyon:
         btnLogout.setOnAction(e -> {
@@ -126,6 +127,10 @@ public class MainFeedController {
 
                 // 3. Kullanıcı verisi aktarılır (İşte burası çağrı noktası!)
                 exploreController.setLoggedUser(loggedUser);
+            }
+            if (controller instanceof NotificationsContentController) {
+                NotificationsContentController notifController = (NotificationsContentController) controller;
+                notifController.setLoggedUser(loggedUser);
             }
             // Keşfet için de aynı mantık uygulanabilir:
             // else if (controller instanceof ExploreContentController) {
