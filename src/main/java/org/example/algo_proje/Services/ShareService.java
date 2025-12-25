@@ -1,5 +1,6 @@
 package org.example.algo_proje.Services;
 
+import org.example.algo_proje.Models.DTOs.PostDTO;
 import org.example.algo_proje.Models.Shares;
 import org.example.algo_proje.Models.Users;
 
@@ -168,5 +169,47 @@ public class ShareService {
             }
         } catch (Exception e) { e.printStackTrace(); }
         return list;
+    }
+    //Keşfet
+    public List<PostDTO> getExplorePosts() {
+
+        List<PostDTO> posts = new ArrayList<>();
+
+        String sql = "SELECT * FROM Shares WHERE IsDeleted = 0";
+
+        try (
+                Connection conn = Database.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()
+        ) {
+
+            while (rs.next()) {
+
+                PostDTO post = new PostDTO();
+
+                post.shareId     = rs.getInt("Id");
+                post.shareUserId = rs.getInt("UserID");
+                post.description = rs.getString("Description");
+                post.path        = rs.getString("Path");
+                post.isImage     = rs.getBoolean("IsImage");
+                post.createdAt   = rs.getTimestamp("CreatedAt");
+
+                Users author = UserService.getUserById(post.shareUserId);
+
+                if (author != null) {
+                    post.authorUserId       = author.getUserId();
+                    post.authorUsername     = author.getUsername();
+                    post.authorFullName     = author.getFullName();
+                    post.authorAvatarBytes  = author.getAvatar();
+                }
+
+                posts.add(post);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return posts;
     }
 }

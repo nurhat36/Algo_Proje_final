@@ -5,6 +5,7 @@ module org.example.algo_proje {
 
     requires java.sql;
     requires java.desktop;
+    requires javafx.graphics;
 
     opens org.example.algo_proje to javafx.fxml;
     exports org.example.algo_proje;

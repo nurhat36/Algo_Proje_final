@@ -6,6 +6,7 @@ import org.example.algo_proje.utils.Security;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class UserService {
 
@@ -55,6 +56,8 @@ public class UserService {
 
             byte[] hash = rs.getBytes("PasswordHash");
             byte[] salt = rs.getBytes("PasswordSalt");
+            System.out.println(new String(hash));
+            System.out.println(new String(salt));
 
             return Security.verifyPassword(password, salt, hash);
 
@@ -250,8 +253,61 @@ public class UserService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return users;
+    }
+
+    public static List<Users> getAllUsers() {
+        List<Users> users = new ArrayList<>();
+
+        String sql = "SELECT * FROM Users";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Users u = new Users();
+                u.setUserId(rs.getInt("UserId"));
+                u.setUsername(rs.getString("Username"));
+                u.setFullName(rs.getString("FullName"));
+                // ihtiyacın olan diğer alanlar
+                users.add(u);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return users;
+    }
+    public static List<Users> searchUsers(String keyword) {
+
+        List<Users> result = new ArrayList<>();
+
+        // Veritabanından veya bellekten kullanıcıları çek
+        List<Users> allUsers = getAllUsers();
+
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return result;
+        }
+
+        // 🔥 ÖNEMLİ: Türkçe karakter sorunu (I-i, İ-i) yaşamamak için Locale kullanıyoruz
+        Locale trLocale = new Locale("tr", "TR");
+        String lowerKeyword = keyword.trim().toLowerCase(trLocale);
+
+        for (Users u : allUsers) {
+
+            // Null kontrolü yapıp küçük harfe çeviriyoruz
+            String username = (u.getUsername() == null) ? "" : u.getUsername().toLowerCase(trLocale);
+            String fullname = (u.getFullName() == null) ? "" : u.getFullName().toLowerCase(trLocale);
+
+            // Şart: Kullanıcı adı VEYA Tam adı aranan kelimeyle BAŞLIYORSA
+            if (username.startsWith(lowerKeyword) || fullname.startsWith(lowerKeyword)) {
+                result.add(u);
+            }
+        }
+
+        return result;
     }
 
 

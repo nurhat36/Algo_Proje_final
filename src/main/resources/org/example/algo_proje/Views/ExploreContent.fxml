@@ -1,18 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox styleClass="feed-area"
-      xmlns="http://javafx.com/javafx/23.0.1"
+<VBox xmlns="http://javafx.com/javafx/23.0.1"
       xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.example.algo_proje.Controllers.ExploreContentController">
+      fx:controller="org.example.algo_proje.Controllers.ExploreContentController"
+      spacing="10"
+      style="-fx-padding: 10;">
 
-    <Label styleClass="feed-title" text="Keşfet / Yeni Arkadaşlar" />
+    <TextField fx:id="txtSearch"
+               promptText="Ara"
+               maxWidth="Infinity"
+               style="-fx-text-fill: black; -fx-prompt-text-fill: gray; -fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 5; -fx-background-radius: 5;"/>
 
-    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
-        <VBox fx:id="exploreUserContainer" spacing="10" style="-fx-padding: 10;" />
+    <ScrollPane fitToWidth="true"
+                VBox.vgrow="ALWAYS"
+                hbarPolicy="NEVER">
+
+        <TilePane fx:id="explorePostContainer"
+                  prefColumns="3"
+                  hgap="10"
+                  vgap="10"/>
     </ScrollPane>
 
 </VBox>

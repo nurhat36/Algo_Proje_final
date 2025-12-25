@@ -53,6 +53,7 @@ public class Users {
     private boolean isDeleted;
     private Date deletedAt;
 
+    byte[] avatar;
     public int getUserId() { return userId; }
     public void setUserId(int userId) { this.userId = userId; }
 
@@ -149,5 +150,8 @@ public class Users {
     public Date getDeletedAt() { return deletedAt; }
     public void setDeletedAt(Date deletedAt) { this.deletedAt = deletedAt; }
 
+    public byte[] getAvatar() {
 
+        return avatar;
+    }
 }

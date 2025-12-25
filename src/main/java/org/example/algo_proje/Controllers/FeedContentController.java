@@ -16,7 +16,6 @@ import org.example.algo_proje.Services.ShareService;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +27,7 @@ public class FeedContentController {
     @FXML public TextArea txtShareContent;
     @FXML public Button btnShare;
     @FXML public Button btnAddPhoto;
+
 
     private Users loggedUser;
     private File selectedShareFile = null;
@@ -209,7 +209,7 @@ public class FeedContentController {
             try {
                 Image iv = PhotoAttribute.loadImageFromResources(
                         p.path,
-                        "/static/Images/Shares_Pics/",
+                        "/Shares_Pics/",
                         getClass()
                 );
 
@@ -369,13 +369,10 @@ public class FeedContentController {
         return list;
     }
 
-
     private void showAlert(String msg) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);
         a.setHeaderText(null);
         a.setContentText(msg);
         a.showAndWait();
     }
-
-
 }
