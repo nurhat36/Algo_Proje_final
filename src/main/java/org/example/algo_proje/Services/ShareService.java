@@ -1,6 +1,8 @@
 package org.example.algo_proje.Services;
 
 import org.example.algo_proje.Models.DTOs.PostDTO;
+import org.example.algo_proje.Models.Raws.CommentRaw;
+import org.example.algo_proje.Models.Raws.LikeRaw;
 import org.example.algo_proje.Models.Shares;
 import org.example.algo_proje.Models.Users;
 
@@ -211,5 +213,43 @@ public class ShareService {
         }
 
         return posts;
+    }
+
+    // Beğeni ham verileri
+    public List<LikeRaw> getAllLikesRaw() {
+        List<LikeRaw> list = new ArrayList<>();
+        // S -> Paylaşım sahibi, L -> Beğenen kişi
+        String sql = "SELECT s.UserId as OwnerId, l.UserId as LikerId FROM Likes l " +
+                "JOIN Shares s ON l.ShareId = s.Id";
+        try (Connection conn = Database.getConnection();
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                LikeRaw lr = new LikeRaw();
+                lr.postOwnerId = rs.getInt("OwnerId");
+                lr.likerId = rs.getInt("LikerId");
+                list.add(lr);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
+    }
+
+    // Yorum ham verileri
+    public List<CommentRaw> getAllCommentsRaw() {
+        List<CommentRaw> list = new ArrayList<>();
+        // S -> Paylaşım sahibi, C -> Yorum yapan kişi
+        String sql = "SELECT s.UserId as OwnerId, c.UserId as CommenterId FROM Comments c " +
+                "JOIN Shares s ON c.ShareId = s.Id";
+        try (Connection conn = Database.getConnection();
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                CommentRaw cr = new CommentRaw();
+                cr.postOwnerId = rs.getInt("OwnerId");
+                cr.commenterId = rs.getInt("CommenterId");
+                list.add(cr);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
     }
 }

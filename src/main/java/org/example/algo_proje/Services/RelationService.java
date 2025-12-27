@@ -1,5 +1,6 @@
 package org.example.algo_proje.Services;
 
+import org.example.algo_proje.Models.Raws.RelationRaw;
 import org.example.algo_proje.Models.Users;
 import java.sql.*;
 import java.util.ArrayList;
@@ -194,6 +195,24 @@ public class RelationService {
         }
         return friends;
     }
+    // RelationService.java içinde
+    public List<RelationRaw> getAllRelationsRaw() {
+        List<RelationRaw> list = new ArrayList<>();
+        String sql = "SELECT User1Id, User2Id, Status FROM Relations"; // Tüm ağ
+        try (Connection conn = Database.getConnection();
+             Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                RelationRaw rr = new RelationRaw();
+                rr.user1 = rs.getInt("User1Id");
+                rr.user2 = rs.getInt("User2Id");
+                rr.status = rs.getInt("Status");
+                list.add(rr);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
+    }
+
 
 
 

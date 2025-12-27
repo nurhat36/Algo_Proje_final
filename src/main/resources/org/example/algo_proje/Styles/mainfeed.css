@@ -125,3 +125,23 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 2);
     -fx-pref-width: 700;
 }
+.tab-menu {
+    -fx-background-color: #f8f9fa;
+    -fx-padding: 10;
+    -fx-background-radius: 10;
+}
+
+.menu-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #657786;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.menu-button-active {
+    -fx-background-color: #0095F6;
+    -fx-text-fill: white;
+    -fx-background-radius: 20;
+    -fx-padding: 5 15;
+    -fx-font-weight: bold;
+}

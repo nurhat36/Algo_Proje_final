@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.geometry.Insets?>
+<VBox prefHeight="800.0" prefWidth="1000.0" spacing="20" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.algo_proje.Controllers.FriendsController">
+    <padding><Insets bottom="20" left="20" right="20" top="20" /></padding>
+
+    <HBox alignment="CENTER" spacing="15" styleClass="tab-menu">
+        <Button fx:id="btnRelationshipScore" onAction="#handleScoreTab" text="İlişki Puanları" styleClass="menu-button-active" />
+        <Button fx:id="btnShowGraph" onAction="#handleGraphTab" text="İlişki Grafiği" styleClass="menu-button" />
+    </HBox>
+
+    <Separator />
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+        <VBox fx:id="contentArea" spacing="10" />
+    </ScrollPane>
+</VBox>

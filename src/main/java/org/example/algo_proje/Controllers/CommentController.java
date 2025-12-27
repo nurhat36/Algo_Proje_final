@@ -135,37 +135,50 @@ public class CommentController {
         txtComment.setPromptText("Düşüncelerini paylaş...");
     }
 
-    // Yorum UI oluştururken Yanıtla aksiyonunu güncelle
     private VBox createCommentUI(Comments c, int depth) {
         VBox box = new VBox(5);
+        // Yanıtsa özel stil sınıfını ekle ve girinti ver
         box.getStyleClass().add(depth > 0 ? "reply-comment-box" : "single-comment-box");
-        if (depth > 0) VBox.setMargin(box, new Insets(0, 0, 0, 45));
-
-        // Yazar ve İçerik Yan Yana (Instagram stili)
-        TextFlow textFlow = new TextFlow();
-        Text authorText = new Text(c.getAuthorName() + " ");
-        authorText.setStyle("-fx-font-weight: bold; -fx-fill: #262626;");
-
-        if (c.getParentAuthorName() != null && depth > 0) {
-            Text mentionText = new Text("@" + c.getParentAuthorName() + " ");
-            mentionText.setStyle("-fx-fill: #00376B; -fx-font-weight: bold;");
-            textFlow.getChildren().add(mentionText);
+        if (depth > 0) {
+            VBox.setMargin(box, new Insets(0, 0, 0, 45)); // Sabit tek tab girinti
         }
 
-        Text commentContent = new Text(c.getContent());
-        textFlow.getChildren().addAll(authorText, commentContent);
+        // 1. YAZAR ADI (En Üstte)
+        Label authorLbl = new Label(c.getAuthorName());
+        authorLbl.getStyleClass().add("comment-author");
 
-        // Alt bar (Zaman + Yanıtla)
-        HBox actionBar = new HBox(15);
-        Label lblTime = new Label(formatDate(c.getCreatedAt()));
-        lblTime.setStyle("-fx-text-fill: #8E8E8E; -fx-font-size: 11px;");
+        // 2. YORUM İÇERİĞİ (TextFlow ile Mentions yapısı)
+        TextFlow contentFlow = new TextFlow();
+        contentFlow.getStyleClass().add("comment-content-flow");
 
-        Hyperlink btnReply = new Hyperlink("Yanıtla");
-        btnReply.getStyleClass().add("reply-link");
-        btnReply.setOnAction(e -> prepareReply(c));
+        // Eğer bu bir yanıtsa, içeriğin başına @mention ekle
+        if (depth > 0 && c.getParentAuthorName() != null) {
+            Text mentionText = new Text("@" + c.getParentAuthorName() + " ");
+            mentionText.setStyle("-fx-fill: #0095f6; -fx-font-weight: bold; -fx-cursor: hand;");
+            contentFlow.getChildren().add(mentionText);
+        }
 
-        actionBar.getChildren().addAll(lblTime, btnReply);
-        box.getChildren().addAll(textFlow, actionBar);
+        // Gerçek yorum metni
+        Text contentText = new Text(c.getContent());
+        contentText.setStyle("-fx-fill: #262626; -fx-font-size: 13px;");
+        contentFlow.getChildren().add(contentText);
+
+        // 3. AKSİYON SATIRI (Zaman ve Yanıtla butonu)
+        HBox actionLine = new HBox(15);
+        actionLine.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+        Label timeLbl = new Label(formatDate(c.getCreatedAt()));
+        timeLbl.setStyle("-fx-text-fill: #8e8e8e; -fx-font-size: 11px;");
+
+        Hyperlink replyLink = new Hyperlink("Yanıtla");
+        replyLink.getStyleClass().add("reply-link");
+        replyLink.setOnAction(e -> prepareReply(c));
+
+        actionLine.getChildren().addAll(timeLbl, replyLink);
+
+        // Tüm parçaları ana kutuya ekle
+        box.getChildren().addAll(authorLbl, contentFlow, actionLine);
+
         return box;
     }
     private String formatDate(Timestamp timestamp) {

@@ -41,7 +41,9 @@
                 <Button fx:id="btnHome" prefWidth="230" styleClass="menu-button-active" text="Anasayfa"/>
                 <Button fx:id="btnExplore" prefWidth="230" styleClass="menu-button" text="Keşfet"/>
                 <Button fx:id="btnNotifications" prefWidth="230" styleClass="menu-button" text="Bildirimler"/>
+                <Button fx:id="btnRelationships" prefWidth="230" styleClass="menu-button" text="İlişkiler" />
                 <Button fx:id="btnSettings" prefWidth="230" styleClass="menu-button" text="Ayarlar"/>
+                <Button fx:id="btnTxtOperations" prefWidth="230" styleClass="menu-button" text="TXT İşlemleri" />
             </VBox>
 
             <VBox VBox.vgrow="ALWAYS"/>

@@ -90,3 +90,35 @@
     -fx-font-weight: bold;
     -fx-cursor: hand;
 }
+
+/* Yorumu yapan kişinin adı */
+.comment-author {
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-text-fill: #262626;
+    -fx-padding: 0 0 2 0;
+}
+
+/* Yorum metni akışı */
+.comment-content-flow {
+    -fx-line-spacing: 2px;
+}
+
+/* Yanıtla butonu stili */
+.reply-link {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #8e8e8e;
+    -fx-padding: 0;
+    -fx-underline: false;
+}
+.reply-link:hover {
+    -fx-text-fill: #262626;
+}
+
+/* Yanıt kutusu solundaki belirteç çizgisi */
+.reply-comment-box {
+    -fx-border-color: #dbdbdb;
+    -fx-border-width: 0 0 0 1.5; /* Sol tarafa ince gri çizgi hiyerarşiyi belli eder */
+    -fx-padding: 0 0 0 10;
+}

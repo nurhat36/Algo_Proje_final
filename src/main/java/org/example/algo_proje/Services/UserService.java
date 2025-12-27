@@ -309,6 +309,28 @@ public class UserService {
 
         return result;
     }
+    // src/main/java/org/example/algo_proje/Services/UserService.java
+
+    public List<Users> getAllUsersExceptMe(int myId) {
+        List<Users> users = new ArrayList<>();
+        String sql = "SELECT * FROM Users WHERE UserId != ?";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, myId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Users u = new Users();
+                    u.setUserId(rs.getInt("UserId"));
+                    u.setUsername(rs.getString("Username"));
+                    u.setFullName(rs.getString("FullName"));
+                    // Gerekirse diğer alanlar...
+                    users.add(u);
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return users;
+    }
 
 
 }

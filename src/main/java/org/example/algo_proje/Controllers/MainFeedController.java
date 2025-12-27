@@ -23,6 +23,8 @@ public class MainFeedController {
     @FXML public Button btnNotifications;
     @FXML public Button btnSettings;
     @FXML public Button btnLogout;
+    @FXML public Button btnRelationships;
+    @FXML public Button btnTxtOperations; // FXML'deki id ile aynı olmalı
 
     // DYNAMIC CONTENT AREA
     @FXML public VBox centerContentArea; // Orta alanın VBox'ı
@@ -33,6 +35,7 @@ public class MainFeedController {
     public void initialize() {
         // Butonlara aksiyonları bağlama
         btnHome.setOnAction(e -> loadCenterContent("/org/example/algo_proje/Views/FeedContent.fxml"));
+        btnTxtOperations.setOnAction(e -> loadCenterContent("/org/example/algo_proje/Views/TxtOperations.fxml"));
 
         // Örnek: Keşfet butonu için (Ayrı bir FXML ve Controller olmalı)
         btnExplore.setOnAction(e -> {
@@ -48,6 +51,11 @@ public class MainFeedController {
             showAlert("Oturum Kapatıldı.");
             // Stage'i kapatma, vb.
         });
+
+        btnRelationships.setOnAction(e -> loadCenterContent("/org/example/algo_proje/Views/friends.fxml"));
+
+// loadCenterContent() metodu içindeki if bloklarına ekle
+
     }
 
     // LoginController'dan çağrılacak
@@ -128,9 +136,18 @@ public class MainFeedController {
                 // 3. Kullanıcı verisi aktarılır (İşte burası çağrı noktası!)
                 exploreController.setLoggedUser(loggedUser);
             }
+            if (controller instanceof FriendsController) {
+                FriendsController friendsController = (FriendsController) controller;
+                // MainController referansı gerekiyorsa aktarabilirsin,
+                // ancak şu anki yapında sadece loggedUser yeterli görünüyor.
+                friendsController.initData(loggedUser);
+            }
             if (controller instanceof NotificationsContentController) {
                 NotificationsContentController notifController = (NotificationsContentController) controller;
                 notifController.setLoggedUser(loggedUser);
+            }
+            if (controller instanceof TxtOperationsController) {
+                ((TxtOperationsController) controller).setLoggedUser(loggedUser);
             }
             // Keşfet için de aynı mantık uygulanabilir:
             // else if (controller instanceof ExploreContentController) {
