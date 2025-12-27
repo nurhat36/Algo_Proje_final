@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+
+<VBox prefHeight="600.0" prefWidth="480.0" spacing="0.0"
+      styleClass="comment-window" xmlns="http://javafx.com/javafx/23.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.algo_proje.Controllers.CommentController">
+
+    <HBox alignment="CENTER" styleClass="header-bar">
+        <padding><Insets bottom="15" top="15"/></padding>
+        <Label styleClass="comment-header-title" text="Yorumlar" />
+    </HBox>
+    <Separator />
+
+    <ScrollPane fitToWidth="true" styleClass="comment-scroll-pane" VBox.vgrow="ALWAYS">
+        <VBox fx:id="commentContainer" spacing="15.0" styleClass="comment-list-container">
+            <padding><Insets bottom="20" left="15" right="15" top="20"/></padding>
+        </VBox>
+    </ScrollPane>
+
+    <HBox fx:id="replyIndicatorBox" managed="false" visible="false" alignment="CENTER_LEFT" styleClass="reply-indicator">
+        <padding><Insets left="15" right="15" top="8" bottom="8"/></padding>
+        <Label fx:id="lblReplyTarget" styleClass="reply-target-text" text="\@kullanici yanıtlanıyor..." />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button onAction="#cancelReply" styleClass="cancel-reply-btn" text="✕" />
+    </HBox>
+
+    <Separator />
+
+    <VBox styleClass="input-section">
+        <padding><Insets bottom="15" left="15" right="15" top="15"/></padding>
+        <HBox spacing="12.0" alignment="BOTTOM_CENTER">
+            <TextArea fx:id="txtComment" prefHeight="45.0" promptText="Düşüncelerini paylaş..."
+                      styleClass="modern-textarea" HBox.hgrow="ALWAYS" wrapText="true" />
+            <Button fx:id="btnSend" onAction="#handleSendComment" prefHeight="45.0"
+                    prefWidth="85.0" styleClass="modern-send-btn" text="Paylaş" />
+        </HBox>
+    </VBox>
+</VBox>

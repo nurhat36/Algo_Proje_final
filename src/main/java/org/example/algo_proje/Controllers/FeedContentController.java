@@ -1,21 +1,29 @@
 package org.example.algo_proje.Controllers;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Cursor;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.example.algo_proje.Attribute.PhotoAttribute;
+import org.example.algo_proje.Models.Comments;
 import org.example.algo_proje.Models.DTOs.PostDTO;
 import org.example.algo_proje.Models.Users;
 import org.example.algo_proje.Models.Shares;
+import org.example.algo_proje.Services.CommentService;
 import org.example.algo_proje.Services.Database;
 import org.example.algo_proje.Services.ShareService;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -209,7 +217,7 @@ public class FeedContentController {
             try {
                 Image iv = PhotoAttribute.loadImageFromResources(
                         p.path,
-                        "/Shares_Pics/",
+                        "/Static/Images/Shares_Pics/",
                         getClass()
                 );
 
@@ -255,12 +263,42 @@ public class FeedContentController {
             a.setContentText(likers.isEmpty() ? "Henüz kimse beğenmedi." : String.join("\n", likers));
             a.showAndWait();
         });
+        // buildPostCard içine eklenecek buton
+        Button btnComment = new Button("💬 ");
+        btnComment.setStyle("-fx-background-radius: 6; -fx-padding: 6 10;");
 
-        actions.getChildren().addAll(btnLike, btnLikers);
+        btnComment.setOnAction(evt -> {
+            showCommentPopup(p); // PostDTO p parametresini kullanır
+        });
+
+        actions.getChildren().addAll(btnLike, btnLikers,btnComment);
         card.getChildren().add(actions);
 
         return card;
     }
+    private void showCommentPopup(PostDTO post) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/algo_proje/Views/CommentView.fxml"));
+            Parent root = loader.load();
+
+            // CSS dosyasını ekle
+            root.getStylesheets().add(getClass().getResource("/org/example/algo_proje/Styles/comment.css").toExternalForm());
+
+            CommentController controller = loader.getController();
+            controller.initData(post, loggedUser);
+
+            Stage stage = new Stage();
+            stage.setTitle(post.authorUsername + " - Paylaşım Yorumları");
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL); // Ana pencereyi kilitler
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     // ------------------ BEĞENİ MANTIKLARI VE AVATAR YÜKLEME ------------------
 

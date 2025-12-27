@@ -83,7 +83,7 @@ public class ExploreContentController {
         try {
             // Sadece dosya ismini al (C:/Users/... kısmını at)
             String fileName = Paths.get(dbPath).getFileName().toString();
-            String resourcePath = "/Shares_Pics/" + fileName;
+            String resourcePath = "/Static/Images/profile_pics/Shares_Pics/" + fileName;
 
             // 1. YÖNTEM: Stream (En Garantisi - Türkçe karakter/boşluk dostu)
             InputStream stream = getClass().getResourceAsStream(resourcePath);
@@ -93,7 +93,7 @@ public class ExploreContentController {
 
             // 2. YÖNTEM: Boşluk Düzeltme (%20)
             String encodedName = fileName.replace(" ", "%20");
-            InputStream retryStream = getClass().getResourceAsStream("/Shares_Pics/" + encodedName);
+            InputStream retryStream = getClass().getResourceAsStream("/Static/Images/profile_pics/Shares_Pics/" + encodedName);
             if (retryStream != null) {
                 return new Image(retryStream);
             }
