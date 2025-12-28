@@ -13,5 +13,5 @@ public class PostDTO {
     public int authorUserId;
     public String authorUsername;
     public String authorFullName;
-    public byte[] authorAvatarBytes;
+    public String authorAvatarBytes;
 }

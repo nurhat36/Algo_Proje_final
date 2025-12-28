@@ -1,7 +1,6 @@
 package org.example.algo_proje.Models;
 
 import java.sql.Date;
-import java.sql.Timestamp;
 
 public class Users {
     private int userId;
@@ -53,7 +52,7 @@ public class Users {
     private boolean isDeleted;
     private Date deletedAt;
 
-    byte[] avatar;
+    String avatar;
     public int getUserId() { return userId; }
     public void setUserId(int userId) { this.userId = userId; }
 
@@ -150,7 +149,7 @@ public class Users {
     public Date getDeletedAt() { return deletedAt; }
     public void setDeletedAt(Date deletedAt) { this.deletedAt = deletedAt; }
 
-    public byte[] getAvatar() {
+    public String getAvatar() {
 
         return avatar;
     }
