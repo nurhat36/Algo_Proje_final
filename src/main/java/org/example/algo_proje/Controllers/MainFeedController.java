@@ -15,7 +15,7 @@ import java.io.IOException;
 
 public class MainFeedController {
 
-    // SIDEBAR FXML
+    // SIDEBAR FXML ELEMENTLERİ
     @FXML public ImageView userAvatar;
     @FXML public Label lblUserName;
     @FXML public Button btnHome;
@@ -24,7 +24,7 @@ public class MainFeedController {
     @FXML public Button btnSettings;
     @FXML public Button btnLogout;
     @FXML public Button btnRelationships;
-    @FXML public Button btnTxtOperations; // FXML'deki id ile aynı olmalı
+    @FXML public Button btnTxtOperations; // FXML'deki fx:id ile aynı olmalı
 
     // DYNAMIC CONTENT AREA
     @FXML public VBox centerContentArea; // Orta alanın VBox'ı
@@ -35,35 +35,32 @@ public class MainFeedController {
     public void initialize() {
         // Butonlara aksiyonları bağlama
         btnHome.setOnAction(e -> loadCenterContent("/org/example/algo_proje/Views/FeedContent.fxml"));
+
+        // TxtOperations (Algoritma Proje) Ekranı
         btnTxtOperations.setOnAction(e -> loadCenterContent("/org/example/algo_proje/Views/TxtOperations.fxml"));
 
-        // Örnek: Keşfet butonu için (Ayrı bir FXML ve Controller olmalı)
-        btnExplore.setOnAction(e -> {
-            // Örnek: Keşfet FXML yolu
-            loadCenterContent("/org/example/algo_proje/Views/ExploreContent.fxml");
+        // Keşfet butonu
+        btnExplore.setOnAction(e -> loadCenterContent("/org/example/algo_proje/Views/ExploreContent.fxml"));
 
-        });
+        // Bildirimler butonu
         btnNotifications.setOnAction(e -> loadCenterContent("/org/example/algo_proje/Views/NotificationsContent.fxml"));
 
-        // Çıkış yap butonu için örnek bir aksiyon:
-        btnLogout.setOnAction(e -> {
-            // Çıkış yapma veya login ekranına dönme mantığı buraya gelir
-            showAlert("Oturum Kapatıldı.");
-            // Stage'i kapatma, vb.
-        });
-
+        // Arkadaş/İlişki butonu
         btnRelationships.setOnAction(e -> loadCenterContent("/org/example/algo_proje/Views/friends.fxml"));
 
-// loadCenterContent() metodu içindeki if bloklarına ekle
-
+        // Çıkış yap butonu
+        btnLogout.setOnAction(e -> {
+            showAlert("Oturum Kapatıldı.");
+            // Burada sahne kapatma veya login ekranına dönüş kodları olabilir
+        });
     }
 
-    // LoginController'dan çağrılacak
+    // LoginController'dan çağrılacak veri aktarım metodu
     public void initData(Users user) {
         this.loggedUser = user;
         if (loggedUser != null) {
             loadSidebarData();
-            // Uygulama açılışında Anasayfa içeriğini yükle
+            // Uygulama açılışında varsayılan olarak Anasayfa içeriğini yükle
             loadCenterContent("/org/example/algo_proje/Views/FeedContent.fxml");
         }
     }
@@ -76,16 +73,14 @@ public class MainFeedController {
                         : loggedUser.getUsername()
         );
 
-        // Profil Fotoğrafını yükle (Mevcut loadProfileImage metodu bu kontrolcüde kalmalı)
+        // Profil Fotoğrafını yükle
         String photoFileName = loggedUser.getProfilePhoto();
         if (photoFileName != null && !photoFileName.isEmpty()) {
             loadProfileImage(photoFileName);
         }
     }
 
-    // ... loadProfileImage metodu buraya taşınabilir veya ayrı bir Manager sınıfında kalabilir.
     private void loadProfileImage(String uniqueFileName) {
-        // Fotoğraf yükleme mantığı
         if (uniqueFileName == null || uniqueFileName.isEmpty()) {
             userAvatar.setImage(null);
             return;
@@ -104,7 +99,6 @@ public class MainFeedController {
             userAvatar.setImage(null);
         }
     }
-    // ...
 
     /**
      * Orta alanı temizler ve belirtilen FXML içeriğini yükler.
@@ -124,35 +118,28 @@ public class MainFeedController {
             // Controller'a eriş ve kullanıcı bilgisini aktar
             Object controller = loader.getController();
 
-            // Kontrolcü Tipine göre ayarları yap
+            // 1. Feed Content
             if (controller instanceof FeedContentController) {
-                FeedContentController feedController = (FeedContentController) controller;
-                // Kullanıcı verisini Feed Controller'a aktar
-                feedController.setLoggedUser(loggedUser);
+                ((FeedContentController) controller).setLoggedUser(loggedUser);
             }
-            if (controller instanceof ExploreContentController) {
-                ExploreContentController exploreController = (ExploreContentController) controller;
-
-                // 3. Kullanıcı verisi aktarılır (İşte burası çağrı noktası!)
-                exploreController.setLoggedUser(loggedUser);
+            // 2. Explore Content
+            else if (controller instanceof ExploreContentController) {
+                ((ExploreContentController) controller).setLoggedUser(loggedUser);
             }
-            if (controller instanceof FriendsController) {
-                FriendsController friendsController = (FriendsController) controller;
-                // MainController referansı gerekiyorsa aktarabilirsin,
-                // ancak şu anki yapında sadece loggedUser yeterli görünüyor.
-                friendsController.initData(loggedUser);
+            // 3. Friends Content
+            else if (controller instanceof FriendsController) {
+                ((FriendsController) controller).initData(loggedUser);
             }
-            if (controller instanceof NotificationsContentController) {
-                NotificationsContentController notifController = (NotificationsContentController) controller;
-                notifController.setLoggedUser(loggedUser);
+            // 4. Notifications Content
+            else if (controller instanceof NotificationsContentController) {
+                ((NotificationsContentController) controller).setLoggedUser(loggedUser);
             }
-            if (controller instanceof TxtOperationsController) {
+            // 5. TxtOperations Content (DÜZELTİLEN KISIM BURASI)
+            else if (controller instanceof TxtOperationsController) {
+                // TxtOperationsController içinde setLoggedUser metodunu oluşturduğumuz için
+                // artık bu satır hata vermeyecektir.
                 ((TxtOperationsController) controller).setLoggedUser(loggedUser);
             }
-            // Keşfet için de aynı mantık uygulanabilir:
-            // else if (controller instanceof ExploreContentController) {
-            //     ((ExploreContentController) controller).setLoggedUser(loggedUser);
-            // }
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -162,6 +149,7 @@ public class MainFeedController {
 
     private void showAlert(String msg) {
         Alert a = new Alert(Alert.AlertType.INFORMATION);
+        a.setTitle("Bilgi");
         a.setHeaderText(null);
         a.setContentText(msg);
         a.showAndWait();

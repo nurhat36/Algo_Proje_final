@@ -6,7 +6,7 @@ import java.sql.DriverManager;
 public class Database {
 
     private static final String URL =
-            "jdbc:sqlserver://DESKTOP-T11FMIO;"
+            "jdbc:sqlserver://DESKTOP-HFA0BQE;"
                     + "databaseName=SocialAppDB;"
                     + "integratedSecurity=true;"
                     + "encrypt=true;"

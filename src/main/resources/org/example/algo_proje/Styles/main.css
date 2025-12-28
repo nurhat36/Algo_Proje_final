@@ -23,7 +23,7 @@
    ======================================== */
 
 .sidebar-menu {
-    -fx-background-color: linear-gradient(to bottom, #667eea 0%, #764ba2 100%);
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #667eea 0%, #764ba2 100%);
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, 3, 0);
 }
 
@@ -104,12 +104,12 @@
 
 /* Special Button (TXT İşlemleri) */
 .menu-button-special {
-    -fx-background-color: linear-gradient(to right, #f093fb 0%, #f5576c 100%);
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 0%, #f093fb 0%, #f5576c 100%);
     -fx-text-fill: white;
 }
 
 .menu-button-special:hover {
-    -fx-background-color: linear-gradient(to right, #f5576c 0%, #f093fb 100%);
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 0%, #f5576c 0%, #f093fb 100%);
     -fx-scale-x: 1.03;
     -fx-scale-y: 1.03;
 }
@@ -189,7 +189,7 @@
 }
 
 .share-button {
-    -fx-background-color: linear-gradient(to right, -primary-gradient-start, -primary-gradient-end);
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 0%, #667eea, #764ba2);
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-background-radius: 10px;
@@ -199,7 +199,7 @@
 }
 
 .share-button:hover {
-    -fx-background-color: linear-gradient(to right, #764ba2, #667eea);
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 0%, #764ba2, #667eea);
     -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;
 }
