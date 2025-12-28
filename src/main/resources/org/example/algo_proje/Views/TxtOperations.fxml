@@ -3,92 +3,68 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: #f0f2f5;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.algo_proje.Controllers.TxtOperationsController">
+<AnchorPane prefHeight="800.0" prefWidth="1200.0" stylesheets="@../Styles/TXTOperation.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.algo_proje.Controllers.TxtOperationsController">
     <children>
-        <HBox spacing="15.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0">
+        <HBox spacing="20.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
             <children>
-                <!-- Sol Panel - Kontrol Butonları -->
-                <VBox prefWidth="320.0" spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);">
-                    <padding>
-                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                    </padding>
+
+                <VBox prefWidth="340.0" spacing="12.0" styleClass="sidebar-card">
                     <children>
-                        <Label text="Kontrol Paneli" textFill="#1a73e8">
-                            <font>
-                                <Font name="System Bold" size="18.0" />
-                            </font>
-                        </Label>
+                        <Label styleClass="header-label" text="Kontrol Paneli" />
                         <Separator prefWidth="200.0" />
 
-                        <!-- Giriş Alanları -->
-                        <Label text="Kullanıcı ID (Kaynak):" />
-                        <TextField fx:id="txtSourceID" promptText="Örn: 105" />
+                        <Label styleClass="section-label" text="KULLANICI BİLGİLERİ" />
+                        <TextField fx:id="txtSourceID" promptText="Kaynak ID (Örn: 105)" />
+                        <TextField fx:id="txtTargetID" promptText="Hedef ID (Örn: 108)" />
 
-                        <Label text="Hedef ID (Opsiyonel):" />
-                        <TextField fx:id="txtTargetID" promptText="Örn: 108" />
-
-                        <!-- Veri Yükleme -->
-                        <Button fx:id="btnLoadFiles" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleLoadAllData" style="-fx-background-color: #34495e; -fx-text-fill: white; -fx-padding: 10;" text="📁 Verileri Yükle (Graf Oluştur)" />
+                        <Button fx:id="btnLoadFiles" maxWidth="Infinity" onAction="#handleLoadAllData" styleClass="button, btn-primary" text="📁 Verileri Yükle &amp; Graf Oluştur" />
 
                         <Separator prefWidth="200.0" />
 
-                        <!-- Temel İşlemler -->
-                        <Label text="Temel İşlemler:" style="-fx-font-weight: bold;" />
+                        <Label styleClass="section-label" text="İLİŞKİ İŞLEMLERİ" />
 
-                        <Button maxWidth="1.7976931348623157E308" onAction="#handleAreFriends" style="-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-padding: 8;" text="🤝 Arkadaş Mı?" />
+                        <HBox spacing="10">
+                            <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" onAction="#handleAreFriends" styleClass="button, btn-success" text="🤝 Arkadaş Mı?" />
+                            <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" onAction="#handleShowFriends" styleClass="button, btn-info" text="👥 Listele" />
+                        </HBox>
 
-                        <Button maxWidth="1.7976931348623157E308" onAction="#handleShowFriends" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-padding: 8;" text="👥 Arkadaşları Göster" />
-
-                        <Button maxWidth="1.7976931348623157E308" onAction="#handleRecommendFriend" style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-padding: 8;" text="➕ Arkadaş Öner" />
-
-                        <Button maxWidth="1.7976931348623157E308" onAction="#handleRemoveFriend" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-padding: 8;" text="➖ Arkadaş Çıkarma Öner" />
-
-                        <Separator prefWidth="200.0" />
-
-                        <!-- İstatistikler -->
-                        <Label text="İstatistikler:" style="-fx-font-weight: bold;" />
-
-                        <Button maxWidth="1.7976931348623157E308" onAction="#handleGeneralRanking" style="-fx-background-color: #2c3e50; -fx-text-fill: white; -fx-padding: 8;" text="📊 Genel Sıralama" />
-
-                        <Button maxWidth="1.7976931348623157E308" onAction="#handleMostLiked" style="-fx-background-color: #e67e22; -fx-text-fill: white; -fx-padding: 8;" text="❤️ En Çok Beğeni Alanlar" />
-
-                        <Button maxWidth="1.7976931348623157E308" onAction="#handleMostCommented" style="-fx-background-color: #16a085; -fx-text-fill: white; -fx-padding: 8;" text="💬 En Çok Yorum Alanlar" />
+                        <Button maxWidth="Infinity" onAction="#handleRecommendFriend" styleClass="button, btn-purple" text="➕ Arkadaş Önerisi Al" />
+                        <Button maxWidth="Infinity" onAction="#handleRemoveFriend" styleClass="button, btn-danger" text="➖ Çıkarma Önerisi Al" />
 
                         <Separator prefWidth="200.0" />
 
-                        <!-- Görselleştirme -->
-                        <Label text="Görselleştirme:" style="-fx-font-weight: bold;" />
+                        <Label styleClass="section-label" text="ANALİZ &amp; İSTATİSTİK" />
 
-                        <Button maxWidth="1.7976931348623157E308" onAction="#handleShowGraph" style="-fx-background-color: #8e44ad; -fx-text-fill: white; -fx-padding: 8;" text="🌐 Graf Yapısını Göster" />
+                        <Button maxWidth="Infinity" onAction="#handleGeneralRanking" styleClass="button, btn-primary" text="📊 Genel Sıralama" />
+
+                        <HBox spacing="10">
+                            <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" onAction="#handleMostLiked" styleClass="button, btn-warning" text="❤️ En Çok Like" />
+                            <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" onAction="#handleMostCommented" styleClass="button, btn-warning" text="💬 En Çok Yorum" />
+                        </HBox>
+
+                        <Separator prefWidth="200.0" />
+
+                        <Label styleClass="section-label" text="GÖRSELLEŞTİRME" />
+                        <Button maxWidth="Infinity" onAction="#handleShowGraph" styleClass="button, btn-purple" text="🌐 Graf Yapısını Göster (GUI)" />
                     </children>
                 </VBox>
 
-                <!-- Sağ Panel - Çıktı Alanı -->
-                <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                <VBox spacing="15.0" HBox.hgrow="ALWAYS">
                     <children>
-                        <Label text="İşlem Çıktıları">
-                            <font>
-                                <Font name="System Bold" size="14.0" />
-                            </font>
-                        </Label>
+                        <Label styleClass="header-label" text="Sistem Çıktıları ve Loglar" />
 
-                        <TextArea fx:id="txtDisplayArea" editable="false" style="-fx-font-family: 'Consolas', 'Courier New', monospace; -fx-font-size: 13;" VBox.vgrow="ALWAYS" wrapText="true" />
+                        <TextArea fx:id="txtDisplayArea" editable="false" styleClass="console-area" VBox.vgrow="ALWAYS" wrapText="true" />
 
-                        <!-- Durum Çubuğu -->
-                        <HBox alignment="CENTER_LEFT" spacing="10.0" style="-fx-background-color: #e8f0fe; -fx-padding: 8; -fx-background-radius: 5;">
+                        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="status-bar">
                             <children>
-                                <Label text="Durum:" textFill="#1967d2">
-                                    <font>
-                                        <Font name="System Bold" size="12.0" />
-                                    </font>
-                                </Label>
-                                <Label fx:id="lblStatus" text="Sistem Hazır. Lütfen verileri yükleyin." />
+                                <Label styleClass="status-label" text="DURUM:" />
+                                <Label fx:id="lblStatus" text="Sistem Hazır. Lütfen verileri yükleyin." textFill="#555555" />
                             </children>
                         </HBox>
                     </children>
                 </VBox>
+
             </children>
         </HBox>
     </children>

@@ -3,6 +3,7 @@ package org.example.algo_proje.utils;
 import org.example.algo_proje.Models.DTOs.FriendScore;
 import org.example.algo_proje.Models.DTOs.RelationScore;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Algorithms {
@@ -101,5 +102,62 @@ public class Algorithms {
         list.set(high, temp);
         return i + 1;
     }
+
+
+    // === MERGE SORT BAŞLANGIÇ (List<String[]> için) ===
+
+    // Ana çağırma metodu
+    public void mergeSortUsers(List<String[]> list) {
+        if (list.size() <= 1) {
+            return; // Liste 1 elemanlıysa zaten sıralıdır
+        }
+
+        // 1. BÖL (Divide)
+        int mid = list.size() / 2;
+
+        // Sol ve Sağ alt listeleri oluştur
+        List<String[]> left = new ArrayList<>();
+        List<String[]> right = new ArrayList<>();
+
+        for (int i = 0; i < mid; i++) left.add(list.get(i));
+        for (int i = mid; i < list.size(); i++) right.add(list.get(i));
+
+        // 2. YÖNET (Conquer) - Rekürsif çağrı
+        mergeSortUsers(left);
+        mergeSortUsers(right);
+
+        // 3. BİRLEŞTİR (Merge)
+        merge(list, left, right);
+    }
+
+    // Yardımcı Birleştirme Metodu
+    private void merge(List<String[]> result, List<String[]> left, List<String[]> right) {
+        int i = 0, j = 0, k = 0;
+
+        // İki listeyi karşılaştırarak ana listeye (result) geri yaz
+        while (i < left.size() && j < right.size()) {
+            String idLeft = left.get(i)[0];   // Kullanıcı ID'si (String)
+            String idRight = right.get(j)[0]; // Kullanıcı ID'si (String)
+
+            // String karşılaştırması (compareTo)
+            // Eğer ID'ler sayısal ise ve sayısal sıralama isteniyorsa:
+            // Integer.parseInt(idLeft) < Integer.parseInt(idRight) yapılabilir.
+            // Ancak şimdilik String (lexicographical) karşılaştırma yapıyoruz:
+            if (idLeft.compareTo(idRight) <= 0) {
+                result.set(k++, left.get(i++));
+            } else {
+                result.set(k++, right.get(j++));
+            }
+        }
+
+        // Geriye kalan elemanları ekle
+        while (i < left.size()) {
+            result.set(k++, left.get(i++));
+        }
+        while (j < right.size()) {
+            result.set(k++, right.get(j++));
+        }
+    }
+    // === MERGE SORT BİTİŞ ===
 
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.Pane?>
+
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.algo_proje.Controllers.GraphViewController"
+            fitToWidth="true" fitToHeight="true">
+    <content>
+        <Pane fx:id="graphPane" prefHeight="800.0" prefWidth="1000.0" style="-fx-background-color: #f8f9fa;" />
+    </content>
+</ScrollPane>

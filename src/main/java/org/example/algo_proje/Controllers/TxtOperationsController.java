@@ -1,7 +1,11 @@
 package org.example.algo_proje.Controllers;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 import org.example.algo_proje.Models.Users;
 import org.example.algo_proje.utils.Algorithms;
 
@@ -100,7 +104,7 @@ public class TxtOperationsController {
 
         // usersList'i de aynı sıraya sokmalıyız ki indeksler (userIDs vs usersList) tutarlı olsun.
         // ID'ye (index 0) göre sıralıyoruz.
-        usersList.sort(Comparator.comparing(u -> u[0]));
+        alg.mergeSortUsers(usersList);
     }
 
     private void grafOlustur() throws IOException {
@@ -287,38 +291,53 @@ public class TxtOperationsController {
     }
 
     private void arkadasOner(String kisiID) {
+        // 1. Kullanıcı kontrolü
         if (findUserById(kisiID) == null) return;
 
         int idx = alg.binarySearch(userIDs, kisiID);
 
-        // Mevcut arkadaşları Set'e atarak hızlı kontrol (Doğru)
-        Set<String> arkadaslar = new HashSet<>();
-        arkadaslar.add(kisiID); // Kendisini de ekle ki kendisine önermesin
+        // --- DEĞİŞİKLİK BURADA BAŞLIYOR ---
+        // Set yerine List kullanıyoruz.
+        // Bu liste hem "zaten arkadaş olanları önerme" kontrolü için
+        // hem de formüldeki "arkadaşlarının arkadaşı" puanını hesaplamak için (T kümesi) lazım.
+        List<String> arkadaslarListesi = new ArrayList<>();
+
+        arkadaslarListesi.add(kisiID); // Kendisini de ekle (kendisine önerilmesin)
+
         for (int i = 0; i < adjacencyMatrix[idx].length; i++) {
-            if (adjacencyMatrix[idx][i] > 0) arkadaslar.add(userIDs.get(i));
+            if (adjacencyMatrix[idx][i] > 0) {
+                arkadaslarListesi.add(userIDs.get(i));
+            }
         }
+        // -----------------------------------
 
         List<FriendScore> oneriler = new ArrayList<>();
 
         for (String aday : userIDs) {
-            // Zaten arkadaşı olmayanları ve kendisi olmayanları kontrol et
-            if (!arkadaslar.contains(aday)) {
 
-                // 1. KISIM: Aday ile Kişi arasındaki puan (Formüldeki ilk terim)
-                // Resimdeki (a,b) sırasına uymak için (aday, kisiID) yaptık.
+            // MANUEL "CONTAINS" KONTROLÜ
+            // Aday, arkadaslarListesi'nde var mı?
+            boolean zatenArkadas = false;
+            for (String arkadas : arkadaslarListesi) {
+                if (arkadas.equals(aday)) {
+                    zatenArkadas = true;
+                    break;
+                }
+            }
+
+            // Eğer listede yoksa (yani arkadaş değilse ve kendisi değilse) işlem yap
+            if (!zatenArkadas) {
+
+                // 1. KISIM: Aday ile Kişi arasındaki puan
                 int oneriPuani = iliskiPuaniHesapla(aday, kisiID);
 
-                // 2. KISIM: Adayın, Kişinin Arkadaşlarıyla olan puanları toplamı (Sigma)
-                int kisiIdx = alg.binarySearch(userIDs, kisiID); // idx değişkenin zaten var ama net olsun
+                // 2. KISIM: Adayın, Kişinin Arkadaşlarıyla olan puanları toplamı
+                // Burada arkadaslarListesi'ni (T kümesi) kullanıyoruz
+                for (String arkadasID : arkadaslarListesi) {
+                    // Kendisi listede olduğu için onu atlamalıyız, yoksa puanı şişirir
+                    if (arkadasID.equals(kisiID)) continue;
 
-                // Kişinin (Osman) tüm arkadaşarını (T) geziyoruz
-                for(int k=0; k < adjacencyMatrix[idx].length; k++) {
-                    if(adjacencyMatrix[idx][k] > 0) { // Eğer k, Osman'ın arkadaşıysa
-                        String arkadasID = userIDs.get(k);
-
-                        // Aday (Mustafa) ile Arkadaş (Ali) arasındaki puanı ekle
-                        oneriPuani += iliskiPuaniHesapla(aday, arkadasID);
-                    }
+                    oneriPuani += iliskiPuaniHesapla(aday, arkadasID);
                 }
 
                 String[] adayData = findUserById(aday);
@@ -326,7 +345,7 @@ public class TxtOperationsController {
             }
         }
 
-        // Sıralama ve Yazdırma (Doğru)
+        // Sıralama ve Yazdırma (Değişmedi)
         if (oneriler.size() > 1) alg.quickSortFriendScore(oneriler, 0, oneriler.size() - 1, true);
 
         StringBuilder sb = new StringBuilder("========== ARKADAŞ ÖNERİLERİ ==========\n\n");
@@ -452,6 +471,36 @@ public class TxtOperationsController {
             return;
         }
         grafGorselGoster();
+        // 3. Ardından Görsel Pencereyi Aç
+        try {
+            // FXML dosyasını yükle
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/algo_proje/Views/GraphView.fxml"));
+
+            // Eğer resources klasör yapın farklıysa yolu kontrol et.
+            // Genelde: "/GraphView.fxml" veya "/org/example/algo_proje/GraphView.fxml" olur.
+
+            Parent root = loader.load();
+
+            // Yeni Controller'a verileri gönder
+            GraphViewController graphController = loader.getController();
+            graphController.drawGraph(usersList, userIDs, adjacencyMatrix);
+
+            // Yeni Sahne ve Pencere Oluştur
+            Stage stage = new Stage();
+            stage.setTitle("Görsel Graf Analizi (Kırmızı: Yakın, Siyah: Arkadaş)");
+            stage.setScene(new Scene(root));
+
+            // Ana pencereyi kilitlemesin istiyorsan bu satırı silebilirsin
+            // stage.initModality(Modality.APPLICATION_MODAL);
+
+            stage.show();
+
+            txtDisplayArea.appendText("\n>> Görsel Graf penceresi açıldı.\n");
+
+        } catch (IOException e) {
+            showAlert("Hata", "Graf penceresi açılırken hata oluştu: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void grafGorselGoster() {
