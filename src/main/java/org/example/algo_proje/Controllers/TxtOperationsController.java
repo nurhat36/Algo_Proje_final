@@ -3,11 +3,14 @@ package org.example.algo_proje.Controllers;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.example.algo_proje.Models.Users;
+import org.example.algo_proje.utils.Algorithms;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import org.example.algo_proje.Models.DTOs.FriendScore;
+import org.example.algo_proje.Models.DTOs.RelationScore;
 
 public class TxtOperationsController {
     @FXML private TextField txtSourceID, txtTargetID;
@@ -15,11 +18,16 @@ public class TxtOperationsController {
     @FXML private Label lblStatus;
     @FXML private Button btnLoadFiles;
 
-    // Veri Yapıları
-    private Map<String, String[]> usersMap = new HashMap<>();
+    // --- VERİ YAPILARI (HashMap yerine List Yapısı) ---
+    // [0]: ID, [1]: Ad, [2]: Cinsiyet
+    private List<String[]> usersList = new ArrayList<>();
     private List<String[]> begeniList = new ArrayList<>();
     private List<String[]> yorumList = new ArrayList<>();
+
+    // Binary Search ve Matris indekslemesi için ID listesi
     private List<String> userIDs = new ArrayList<>();
+
+    private Algorithms alg = new Algorithms();
     private int[][] adjacencyMatrix;
 
     private Users loggedUser;
@@ -28,26 +36,48 @@ public class TxtOperationsController {
         this.loggedUser = user;
     }
 
+    // --- YARDIMCI METOT: Manuel Arama ---
+    // HashMap.get() yerine bu metodu kullanıyoruz.
+    // Binary Search ile ID'nin indeksini bulup, usersList'ten veriyi çeker.
+    private String[] findUserById(String id) {
+        if (userIDs.isEmpty()) return null;
+
+        // Algorithms sınıfındaki binarySearch metodunu kullanıyoruz
+        int index = alg.binarySearch(userIDs, id);
+
+        if (index != -1 && index < usersList.size()) {
+            return usersList.get(index);
+        }
+        return null;
+    }
+
     @FXML
     public void handleLoadAllData() {
         try {
             txtDisplayArea.clear();
             dosyaOku();
             grafOlustur();
-            lblStatus.setText("Veriler ve Graf başarıyla yüklendi.");
-            txtDisplayArea.appendText("=== Sistem Hazır ===\n");
-            txtDisplayArea.appendText("Tüm dosyalar yüklendi.\n");
-            txtDisplayArea.appendText("Graf yapısı oluşturuldu.\n");
-            txtDisplayArea.appendText("Toplam " + usersMap.size() + " kullanıcı bulundu.\n");
+
+            lblStatus.setText("Sistem başarıyla yüklendi.");
+            txtDisplayArea.appendText("==================================================\n");
+            txtDisplayArea.appendText("          BİNGÖL SOSYAL AĞ SİSTEMİ\n");
+            txtDisplayArea.appendText("==================================================\n");
+            txtDisplayArea.appendText(">> [OK] Kişiler dosyası okundu.\n");
+            txtDisplayArea.appendText(">> [OK] İlişkiler matrise aktarıldı.\n");
+            txtDisplayArea.appendText(">> [OK] Etkileşim verileri (Beğeni/Yorum) yüklendi.\n");
+            txtDisplayArea.appendText("--------------------------------------------------\n");
+            txtDisplayArea.appendText("TOPLAM KULLANICI SAYISI: " + usersList.size() + "\n");
+            txtDisplayArea.appendText("==================================================\n");
+
         } catch (Exception e) {
             showAlert("Hata", "Dosyalar okunurken hata: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    //  DOSYA OKUMA
+    // --- DOSYA OKUMA VE SIRALAMA ---
     private void dosyaOku() throws IOException {
-        usersMap.clear();
+        usersList.clear();
         userIDs.clear();
 
         List<String> lines = Files.readAllLines(Paths.get("src/main/resources/static/data/Kisiler.txt"));
@@ -57,12 +87,20 @@ public class TxtOperationsController {
                 String id = parts[0].trim();
                 String ad = parts[1].trim();
                 String cinsiyet = parts[2].trim();
-                usersMap.put(id, new String[]{ad, cinsiyet});
+
+                // Listeye ekleme yapıyoruz
+                usersList.add(new String[]{id, ad, cinsiyet});
                 userIDs.add(id);
             }
         }
 
-        quickSortStrings(userIDs, 0, userIDs.size() - 1);
+        // --- KRİTİK NOKTA ---
+        // Binary Search yapabilmek için ID listesini sıralamalıyız.
+        alg.quickSortStrings(userIDs, 0, userIDs.size() - 1);
+
+        // usersList'i de aynı sıraya sokmalıyız ki indeksler (userIDs vs usersList) tutarlı olsun.
+        // ID'ye (index 0) göre sıralıyoruz.
+        usersList.sort(Comparator.comparing(u -> u[0]));
     }
 
     private void grafOlustur() throws IOException {
@@ -110,104 +148,7 @@ public class TxtOperationsController {
         }
     }
 
-    //  ALGORİTMALAR MANUEL SORT SEARCH
-
-    private int binarySearch(List<String> list, String key) {
-        int left = 0, right = list.size() - 1;
-        int keyNum = Integer.parseInt(key);
-
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-            int midNum = Integer.parseInt(list.get(mid));
-
-            if (midNum == keyNum) return mid;
-            if (midNum < keyNum) left = mid + 1;
-            else right = mid - 1;
-        }
-        return -1;
-    }
-
-    private void quickSortStrings(List<String> list, int low, int high) {
-        if (low < high) {
-            int pi = partitionStrings(list, low, high);
-            quickSortStrings(list, low, pi - 1);
-            quickSortStrings(list, pi + 1, high);
-        }
-    }
-
-    private int partitionStrings(List<String> list, int low, int high) {
-        int pivot = Integer.parseInt(list.get(high));
-        int i = (low - 1);
-        for (int j = low; j < high; j++) {
-            if (Integer.parseInt(list.get(j)) < pivot) {
-                i++;
-                String temp = list.get(i);
-                list.set(i, list.get(j));
-                list.set(j, temp);
-            }
-        }
-        String temp = list.get(i + 1);
-        list.set(i + 1, list.get(high));
-        list.set(high, temp);
-        return i + 1;
-    }
-
-    private void quickSortFriendScore(List<FriendScore> list, int low, int high, boolean descending) {
-        if (low < high) {
-            int pi = partitionFriendScore(list, low, high, descending);
-            quickSortFriendScore(list, low, pi - 1, descending);
-            quickSortFriendScore(list, pi + 1, high, descending);
-        }
-    }
-
-    private int partitionFriendScore(List<FriendScore> list, int low, int high, boolean descending) {
-        FriendScore pivot = list.get(high);
-        int i = (low - 1);
-        for (int j = low; j < high; j++) {
-            boolean condition;
-            if (descending) {
-                condition = list.get(j).puan > pivot.puan;
-            } else {
-                condition = list.get(j).puan < pivot.puan;
-            }
-
-            if (condition) {
-                i++;
-                FriendScore temp = list.get(i);
-                list.set(i, list.get(j));
-                list.set(j, temp);
-            }
-        }
-        FriendScore temp = list.get(i + 1);
-        list.set(i + 1, list.get(high));
-        list.set(high, temp);
-        return i + 1;
-    }
-
-    private void quickSortRelationScore(List<RelationScore> list, int low, int high) {
-        if (low < high) {
-            int pi = partitionRelationScore(list, low, high);
-            quickSortRelationScore(list, low, pi - 1);
-            quickSortRelationScore(list, pi + 1, high);
-        }
-    }
-
-    private int partitionRelationScore(List<RelationScore> list, int low, int high) {
-        RelationScore pivot = list.get(high);
-        int i = (low - 1);
-        for (int j = low; j < high; j++) {
-            if (list.get(j).puan > pivot.puan) {
-                i++;
-                RelationScore temp = list.get(i);
-                list.set(i, list.get(j));
-                list.set(j, temp);
-            }
-        }
-        RelationScore temp = list.get(i + 1);
-        list.set(i + 1, list.get(high));
-        list.set(high, temp);
-        return i + 1;
-    }
+    // --- İŞLEM FONKSİYONLARI ---
 
     @FXML
     private void handleAreFriends() {
@@ -219,24 +160,29 @@ public class TxtOperationsController {
             return;
         }
 
-        if (!usersMap.containsKey(sID) || !usersMap.containsKey(tID)) {
-            showAlert("Hata", "Kullanıcı bulunamadı.");
+        // List üzerinden arama yapıyoruz
+        String[] user1 = findUserById(sID);
+        String[] user2 = findUserById(tID);
+
+        if (user1 == null || user2 == null) {
+            showAlert("Hata", "Girilen ID'ye sahip kullanıcı bulunamadı.");
             return;
         }
 
         int durum = getIliskiDurumu(sID, tID);
-        String sName = usersMap.get(sID)[0];
-        String tName = usersMap.get(tID)[0];
-        String msg = (durum == 2) ? "Yakın Arkadaştır" : (durum == 1) ? "Arkadaştır" : "Arkadaş Değildir";
+        String msg = (durum == 2) ? "YAKIN ARKADAŞ" : (durum == 1) ? "ARKADAŞ" : "ARKADAŞ DEĞİL";
 
         txtDisplayArea.clear();
-        txtDisplayArea.appendText("=== ARKADAŞLIK DURUMU ===\n");
-        txtDisplayArea.appendText(sName + " ve " + tName + ": " + msg + "\n");
+        txtDisplayArea.appendText("------------ İLİŞKİ SORGULAMA ------------\n");
+        txtDisplayArea.appendText(String.format("Kaynak Kişi : %-15s (ID: %s)\n", user1[1], sID));
+        txtDisplayArea.appendText(String.format("Hedef Kişi  : %-15s (ID: %s)\n", user2[1], tID));
+        txtDisplayArea.appendText("------------------------------------------\n");
+        txtDisplayArea.appendText("SONUÇ       : " + msg + "\n");
     }
 
     private int getIliskiDurumu(String s, String t) {
-        int sIdx = binarySearch(userIDs, s);
-        int tIdx = binarySearch(userIDs, t);
+        int sIdx = alg.binarySearch(userIDs, s);
+        int tIdx = alg.binarySearch(userIDs, t);
 
         if (sIdx == -1 || tIdx == -1) return 0;
         return adjacencyMatrix[sIdx][tIdx];
@@ -245,12 +191,15 @@ public class TxtOperationsController {
     private int iliskiPuaniHesapla(String i, String j) {
         int puan = 0;
         int durum = getIliskiDurumu(i, j);
+
+        // Temel Puanlar
         if (durum == 1) puan += 15;
         else if (durum == 2) puan += 30;
 
+        // Beğeni Puanları
         for (String[] b : begeniList) {
             if (b.length >= 3) {
-                String paylasimID = b[0].trim();
+                String paylasimID = b[0].trim(); // format: userID-postID
                 String begenenID = b[1].trim();
                 String begeniTuru = b[2].trim();
 
@@ -260,6 +209,7 @@ public class TxtOperationsController {
             }
         }
 
+        // Yorum Puanları
         for (String[] y : yorumList) {
             if (y.length >= 3) {
                 String paylasimID = y[0].trim();
@@ -284,9 +234,13 @@ public class TxtOperationsController {
     }
 
     private void arkadasGoster(String kisiID) {
-        if (!usersMap.containsKey(kisiID)) return;
+        String[] user = findUserById(kisiID);
+        if (user == null) {
+            showAlert("Hata", "Kullanıcı bulunamadı!");
+            return;
+        }
 
-        int idx = binarySearch(userIDs, kisiID);
+        int idx = alg.binarySearch(userIDs, kisiID);
         List<FriendScore> yakin = new ArrayList<>();
         List<FriendScore> arkadas = new ArrayList<>();
 
@@ -294,22 +248,33 @@ public class TxtOperationsController {
             int durum = adjacencyMatrix[idx][i];
             if (durum > 0) {
                 String friendID = userIDs.get(i);
+                String[] friendData = findUserById(friendID);
                 int puan = iliskiPuaniHesapla(kisiID, friendID);
-                FriendScore fs = new FriendScore(friendID, usersMap.get(friendID)[0], puan, durum);
+
+                FriendScore fs = new FriendScore(friendID, friendData[1], puan, durum);
                 if (durum == 2) yakin.add(fs);
                 else arkadas.add(fs);
             }
         }
 
-        if (yakin.size() > 1) quickSortFriendScore(yakin, 0, yakin.size() - 1, true);
-        if (arkadas.size() > 1) quickSortFriendScore(arkadas, 0, arkadas.size() - 1, true);
+        // Puanlarına göre sırala
+        if (yakin.size() > 1) alg.quickSortFriendScore(yakin, 0, yakin.size() - 1, true);
+        if (arkadas.size() > 1) alg.quickSortFriendScore(arkadas, 0, arkadas.size() - 1, true);
 
         StringBuilder sb = new StringBuilder();
-        sb.append("=== ").append(usersMap.get(kisiID)[0]).append(" ARKADAŞ LİSTESİ ===\n\n");
-        sb.append("YAKIN ARKADAŞLAR:\n");
-        for (FriendScore fs : yakin) sb.append(String.format("  %s (%s) - Puan: %d\n", fs.name, fs.id, fs.puan));
-        sb.append("\nARKADAŞLAR:\n");
-        for (FriendScore fs : arkadas) sb.append(String.format("  %s (%s) - Puan: %d\n", fs.name, fs.id, fs.puan));
+        sb.append("========= ").append(user[1].toUpperCase()).append(" (ID: ").append(kisiID).append(") =========\n\n");
+
+        sb.append(">>> YAKIN ARKADAŞLAR\n");
+        sb.append(String.format("%-8s %-20s %-10s\n", "ID", "İSİM", "PUAN"));
+        sb.append("---------------------------------------\n");
+        for (FriendScore fs : yakin)
+            sb.append(String.format("%-8s %-20s %-10d\n", fs.id, fs.name, fs.puan));
+
+        sb.append("\n>>> ARKADAŞLAR\n");
+        sb.append(String.format("%-8s %-20s %-10s\n", "ID", "İSİM", "PUAN"));
+        sb.append("---------------------------------------\n");
+        for (FriendScore fs : arkadas)
+            sb.append(String.format("%-8s %-20s %-10d\n", fs.id, fs.name, fs.puan));
 
         txtDisplayArea.setText(sb.toString());
     }
@@ -322,11 +287,13 @@ public class TxtOperationsController {
     }
 
     private void arkadasOner(String kisiID) {
-        int idx = binarySearch(userIDs, kisiID);
-        if (idx == -1) return;
+        if (findUserById(kisiID) == null) return;
 
+        int idx = alg.binarySearch(userIDs, kisiID);
+
+        // Mevcut arkadaşları Set'e atarak hızlı kontrol (Doğru)
         Set<String> arkadaslar = new HashSet<>();
-        arkadaslar.add(kisiID);
+        arkadaslar.add(kisiID); // Kendisini de ekle ki kendisine önermesin
         for (int i = 0; i < adjacencyMatrix[idx].length; i++) {
             if (adjacencyMatrix[idx][i] > 0) arkadaslar.add(userIDs.get(i));
         }
@@ -334,28 +301,38 @@ public class TxtOperationsController {
         List<FriendScore> oneriler = new ArrayList<>();
 
         for (String aday : userIDs) {
+            // Zaten arkadaşı olmayanları ve kendisi olmayanları kontrol et
             if (!arkadaslar.contains(aday)) {
-                int oneriPuani = iliskiPuaniHesapla(kisiID, aday);
-                int adayIdx = binarySearch(userIDs, aday);
-                if (adayIdx != -1) {
-                    for(int k=0; k<adjacencyMatrix[idx].length; k++) {
-                        if(adjacencyMatrix[idx][k] > 0) {
-                            String arkadasID = userIDs.get(k);
-                            oneriPuani += iliskiPuaniHesapla(aday, arkadasID);
-                        }
+
+                // 1. KISIM: Aday ile Kişi arasındaki puan (Formüldeki ilk terim)
+                // Resimdeki (a,b) sırasına uymak için (aday, kisiID) yaptık.
+                int oneriPuani = iliskiPuaniHesapla(aday, kisiID);
+
+                // 2. KISIM: Adayın, Kişinin Arkadaşlarıyla olan puanları toplamı (Sigma)
+                int kisiIdx = alg.binarySearch(userIDs, kisiID); // idx değişkenin zaten var ama net olsun
+
+                // Kişinin (Osman) tüm arkadaşarını (T) geziyoruz
+                for(int k=0; k < adjacencyMatrix[idx].length; k++) {
+                    if(adjacencyMatrix[idx][k] > 0) { // Eğer k, Osman'ın arkadaşıysa
+                        String arkadasID = userIDs.get(k);
+
+                        // Aday (Mustafa) ile Arkadaş (Ali) arasındaki puanı ekle
+                        oneriPuani += iliskiPuaniHesapla(aday, arkadasID);
                     }
                 }
-                oneriler.add(new FriendScore(aday, usersMap.get(aday)[0], oneriPuani, 0));
+
+                String[] adayData = findUserById(aday);
+                oneriler.add(new FriendScore(aday, adayData[1], oneriPuani, 0));
             }
         }
 
-        if (oneriler.size() > 1) quickSortFriendScore(oneriler, 0, oneriler.size() - 1, true);
+        // Sıralama ve Yazdırma (Doğru)
+        if (oneriler.size() > 1) alg.quickSortFriendScore(oneriler, 0, oneriler.size() - 1, true);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== ÖNERİLEN ARKADAŞLAR ===\n");
-        for (int i = 0; i < Math.min(3, oneriler.size()); i++) {
+        StringBuilder sb = new StringBuilder("========== ARKADAŞ ÖNERİLERİ ==========\n\n");
+        for (int i = 0; i < Math.min(5, oneriler.size()); i++) {
             FriendScore fs = oneriler.get(i);
-            sb.append(String.format("%d. %s (ID: %s) - Puan: %d\n", i + 1, fs.name, fs.id, fs.puan));
+            sb.append(String.format("%d. %-20s [Puan: %4d] (ID: %s)\n", i + 1, fs.name, fs.puan, fs.id));
         }
         txtDisplayArea.setText(sb.toString());
     }
@@ -368,24 +345,28 @@ public class TxtOperationsController {
     }
 
     private void arkadasCikarmaOner(String kisiID) {
-        int idx = binarySearch(userIDs, kisiID);
+        int idx = alg.binarySearch(userIDs, kisiID);
+        if (idx == -1) return;
+
         List<FriendScore> arkadaslar = new ArrayList<>();
 
         for (int i = 0; i < adjacencyMatrix[idx].length; i++) {
             if (adjacencyMatrix[idx][i] > 0) {
                 String fID = userIDs.get(i);
+                String[] fData = findUserById(fID);
                 int puan = iliskiPuaniHesapla(kisiID, fID);
-                arkadaslar.add(new FriendScore(fID, usersMap.get(fID)[0], puan, adjacencyMatrix[idx][i]));
+                arkadaslar.add(new FriendScore(fID, fData[1], puan, adjacencyMatrix[idx][i]));
             }
         }
 
-        if (arkadaslar.size() > 1) quickSortFriendScore(arkadaslar, 0, arkadaslar.size() - 1, false);
+        // Puanı DÜŞÜK olandan yüksek olana doğru sıralama (false parametresi ile)
+        if (arkadaslar.size() > 1) alg.quickSortFriendScore(arkadaslar, 0, arkadaslar.size() - 1, false);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== ARKADAŞLIKTAN ÇIKARILMASI ÖNERİLENLER ===\n");
+        StringBuilder sb = new StringBuilder("=== ARKADAŞLIKTAN ÇIKARILMA ÖNERİSİ ===\n");
+        sb.append("(En Düşük Puanlılar)\n\n");
         for (int i = 0; i < Math.min(3, arkadaslar.size()); i++) {
             FriendScore fs = arkadaslar.get(i);
-            sb.append(String.format("%d. %s (ID: %s) - Puan: %d\n", i + 1, fs.name, fs.id, fs.puan));
+            sb.append(String.format("%d. %-20s [Puan: %d] (ID: %s)\n", i + 1, fs.name, fs.puan, fs.id));
         }
         txtDisplayArea.setText(sb.toString());
     }
@@ -397,20 +378,34 @@ public class TxtOperationsController {
 
     private void genelSiralama() {
         List<RelationScore> list = new ArrayList<>();
+        int idCounter = 1;
+
         for (int i = 0; i < userIDs.size(); i++) {
-            for (int j = i + 1; j < userIDs.size(); j++) {
-                String u1 = userIDs.get(i);
-                String u2 = userIDs.get(j);
-                list.add(new RelationScore(u1, usersMap.get(u1)[0], u2, usersMap.get(u2)[0], iliskiPuaniHesapla(u1, u2)));
+            for (int j = 0; j < userIDs.size(); j++) {
+                String u1ID = userIDs.get(i);
+                String u2ID = userIDs.get(j);
+
+                if(u1ID.equals(u2ID)) continue;
+
+                String[] u1Data = findUserById(u1ID);
+                String[] u2Data = findUserById(u2ID);
+
+                int puan = iliskiPuaniHesapla(u1ID, u2ID);
+                list.add(new RelationScore(idCounter++, u1ID, u1Data[1], u2ID, u2Data[1], puan));
             }
         }
 
-        if (list.size() > 1) quickSortRelationScore(list, 0, list.size() - 1);
+        if (list.size() > 1) alg.quickSortRelationScore(list, 0, list.size() - 1);
 
-        StringBuilder sb = new StringBuilder("=== GENEL SIRALAMA ===\n");
-        sb.append(String.format("%-10s %-10s %-10s %-10s %s\n", "ID1", "Ad1", "ID2", "Ad2", "Puan"));
-        for (RelationScore rs : list) {
-            sb.append(String.format("%-10s %-10s %-10s %-10s %d\n", rs.id1, rs.name1, rs.id2, rs.name2, rs.puan));
+        StringBuilder sb = new StringBuilder("========== GENEL AĞ SIRALAMASI ==========\n\n");
+        sb.append(String.format("%-6s %-15s %-15s %-6s\n","NO", "KİŞİ 1", "KİŞİ 2", "PUAN"));
+        sb.append("---------------------------------------------\n");
+
+        // İlk 50 ilişkiyi gösterelim ki ekran dolmasın
+        for (int k = 0; k < list.size(); k++) {
+            RelationScore rs = list.get(k);
+            sb.append(String.format("%-6d %-15s %-15s %-6d\n",
+                    k+1, rs.name1, rs.name2, rs.puan));
         }
         txtDisplayArea.setText(sb.toString());
     }
@@ -419,30 +414,33 @@ public class TxtOperationsController {
     @FXML private void handleMostCommented() { showStats(false); }
 
     private void showStats(boolean isLike) {
+        // ID -> Adet haritası (Frekans sayımı)
         Map<String, Integer> counts = new HashMap<>();
         List<String[]> sourceList = isLike ? begeniList : yorumList;
 
         for (String[] item : sourceList) {
             if (item.length < 3) continue;
+            // Beğeni ise sadece "1" olanları (Like) say, Dislike (0) sayma
             if (isLike && !item[2].trim().equals("1")) continue;
 
             String paylasimID = item[0].trim();
-            String userID = paylasimID.split("-")[0];
+            String userID = paylasimID.split("-")[0]; // "1-10" -> "1"
             counts.put(userID, counts.getOrDefault(userID, 0) + 1);
         }
 
         List<FriendScore> stats = new ArrayList<>();
         for (String uid : counts.keySet()) {
-            if (usersMap.containsKey(uid)) {
-                stats.add(new FriendScore(uid, usersMap.get(uid)[0], counts.get(uid), 0));
+            String[] uData = findUserById(uid);
+            if (uData != null) {
+                stats.add(new FriendScore(uid, uData[1], counts.get(uid), 0));
             }
         }
 
-        if (stats.size() > 1) quickSortFriendScore(stats, 0, stats.size() - 1, true);
+        if (stats.size() > 1) alg.quickSortFriendScore(stats, 0, stats.size() - 1, true);
 
         StringBuilder sb = new StringBuilder(isLike ? "=== EN ÇOK BEĞENİ ALANLAR ===\n" : "=== EN ÇOK YORUM ALANLAR ===\n");
-        for (int i = 0; i < Math.min(3, stats.size()); i++) {
-            sb.append(String.format("%d. %s - Sayı: %d\n", i + 1, stats.get(i).name, stats.get(i).puan));
+        for (int i = 0; i < Math.min(5, stats.size()); i++) {
+            sb.append(String.format("%d. %-20s - Adet: %d\n", i + 1, stats.get(i).name, stats.get(i).puan));
         }
         txtDisplayArea.setText(sb.toString());
     }
@@ -458,19 +456,20 @@ public class TxtOperationsController {
 
     private void grafGorselGoster() {
         StringBuilder sb = new StringBuilder();
-        sb.append("=== BINGÖL SOSYAL PAYLAŞIM AĞI - GRAF YAPISI ===\n\n");
+        sb.append("========= BİNGÖL SOSYAL AĞ - GRAF YAPISI =========\n\n");
 
-        sb.append("Düğümler (Kullanıcılar):\n");
-        sb.append("─".repeat(80)).append("\n");
-
+        sb.append(">>> DÜĞÜMLER (Users):\n");
+        sb.append("--------------------------------------------------\n");
+        int rowCount = 0;
         for (String userID : userIDs) {
-            String userName = usersMap.get(userID)[0];
-            sb.append(String.format("● %s (%s)\n", userName, userID));
+            String userName = findUserById(userID)[1];
+            sb.append(String.format("[%s:%s]  ", userID, userName));
+            rowCount++;
+            if(rowCount % 4 == 0) sb.append("\n"); // Her satırda 4 kişi göster
         }
 
-        sb.append("\n").append("═".repeat(80)).append("\n\n");
-        sb.append("Bağlantılar (İlişkiler):\n");
-        sb.append("─".repeat(80)).append("\n");
+        sb.append("\n\n>>> KENARLAR (Edges / İlişkiler):\n");
+        sb.append("--------------------------------------------------\n");
 
         int yakinArkadas = 0, arkadas = 0;
 
@@ -478,30 +477,27 @@ public class TxtOperationsController {
             for (int j = i + 1; j < userIDs.size(); j++) {
                 int durum = adjacencyMatrix[i][j];
                 if (durum > 0) {
-                    String user1 = usersMap.get(userIDs.get(i))[0];
-                    String user2 = usersMap.get(userIDs.get(j))[0];
                     String id1 = userIDs.get(i);
                     String id2 = userIDs.get(j);
-                    int puan = iliskiPuaniHesapla(id1, id2);
+                    String u1 = findUserById(id1)[1];
+                    String u2 = findUserById(id2)[1];
 
                     if (durum == 2) {
-                        sb.append(String.format("  %s (%s) ═══════ %s (%s)  [Yakın Arkadaş - Puan: %d]\n",
-                                user1, id1, user2, id2, puan));
+                        sb.append(String.format("  %-10s <=====YAKIN=====> %-10s\n", u1, u2));
                         yakinArkadas++;
                     } else if (durum == 1) {
-                        sb.append(String.format("  %s (%s) ─────── %s (%s)  [Arkadaş - Puan: %d]\n",
-                                user1, id1, user2, id2, puan));
+                        sb.append(String.format("  %-10s <-----ARKADAŞ-----> %-10s\n", u1, u2));
                         arkadas++;
                     }
                 }
             }
         }
 
-        sb.append("\n").append("═".repeat(80)).append("\n\n");
-        sb.append("İSTATİSTİKLER:\n");
-        sb.append(String.format("  • Toplam Kullanıcı: %d\n", userIDs.size()));
-        sb.append(String.format("  • Yakın Arkadaş Bağlantısı: %d\n", yakinArkadas));
-        sb.append(String.format("  • Arkadaş Bağlantısı: %d\n", arkadas));
+        sb.append("\n==================================================\n");
+        sb.append("GRAF İSTATİSTİKLERİ:\n");
+        sb.append(String.format("  • Toplam Düğüm (User) : %d\n", userIDs.size()));
+        sb.append(String.format("  • Yakın Arkadaş Kenarı: %d\n", yakinArkadas));
+        sb.append(String.format("  • Normal Arkadaş Kenarı: %d\n", arkadas));
 
         txtDisplayArea.setText(sb.toString());
     }
@@ -509,23 +505,8 @@ public class TxtOperationsController {
     private void showAlert(String title, String msg) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
+        alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.showAndWait();
-    }
-
-    private static class FriendScore {
-        String id, name;
-        int puan, durum;
-        FriendScore(String id, String name, int puan, int durum) {
-            this.id = id; this.name = name; this.puan = puan; this.durum = durum;
-        }
-    }
-
-    private static class RelationScore {
-        String id1, name1, id2, name2;
-        int puan;
-        RelationScore(String id1, String name1, String id2, String name2, int puan) {
-            this.id1 = id1; this.name1 = name1; this.id2 = id2; this.name2 = name2; this.puan = puan;
-        }
     }
 }
