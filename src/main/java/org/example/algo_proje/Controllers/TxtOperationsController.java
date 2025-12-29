@@ -289,6 +289,71 @@ public class TxtOperationsController {
         if (id.isEmpty()) return;
         arkadasOner(id);
     }
+    @FXML
+    private void handleCommonFriends() {
+        String sID = txtSourceID.getText().trim();
+        String tID = txtTargetID.getText().trim();
+
+        // 1. Önce kullanıcıların varlığını kontrol et (Manuel Arama ile)
+        String[] user1 = findUserById(sID);
+        String[] user2 = findUserById(tID);
+
+        if (user1 == null || user2 == null) {
+            showAlert("Hata", "Lütfen geçerli Kaynak ve Hedef ID giriniz.");
+            return;
+        }
+
+        if (sID.equals(tID)) {
+            showAlert("Uyarı", "Lütfen iki farklı kullanıcı ID'si giriniz.");
+            return;
+        }
+
+        // 2. Binary Search ile indekslerini bul
+        int idx1 = alg.binarySearch(userIDs, sID);
+        int idx2 = alg.binarySearch(userIDs, tID);
+
+        // 3. Ortak Arkadaşları Hesapla
+        List<String> ortakArkadaslar = new ArrayList<>();
+        int sayac = 0;
+
+        // Matrisin uzunluğu kadar dön (Tüm kullanıcıları tara)
+        // Eğer her iki satırda da aynı sütun (i) 0'dan büyükse, ikisi de o kişiyle arkadaştır.
+        for (int i = 0; i < adjacencyMatrix[idx1].length; i++) {
+            boolean user1Arkadas = adjacencyMatrix[idx1][i] > 0;
+            boolean user2Arkadas = adjacencyMatrix[idx2][i] > 0;
+
+            if (user1Arkadas && user2Arkadas) {
+                String commonID = userIDs.get(i);
+                String[] commonUser = findUserById(commonID);
+
+                // Matristeki ilişki tipine göre (1 veya 2) detay eklenebilir ama
+                // şimdilik sadece isim ve ID alıyoruz.
+                ortakArkadaslar.add(String.format("%s (ID: %s)", commonUser[1], commonID));
+                sayac++;
+            }
+        }
+
+        // 4. Sonucu Ekrana Bas
+        txtDisplayArea.clear();
+        StringBuilder sb = new StringBuilder();
+        sb.append("========== ORTAK ARKADAŞ ANALİZİ ==========\n\n");
+        sb.append(String.format("1. Kullanıcı: %-15s (ID: %s)\n", user1[1], sID));
+        sb.append(String.format("2. Kullanıcı: %-15s (ID: %s)\n", user2[1], tID));
+        sb.append("-------------------------------------------\n");
+        sb.append(String.format("ORTAK ARKADAŞ SAYISI: %d\n", sayac));
+        sb.append("-------------------------------------------\n");
+
+        if (sayac > 0) {
+            sb.append("LİSTE:\n");
+            for (String satir : ortakArkadaslar) {
+                sb.append("  ✔ ").append(satir).append("\n");
+            }
+        } else {
+            sb.append("Herhangi bir ortak arkadaş bulunamadı.\n");
+        }
+
+        txtDisplayArea.setText(sb.toString());
+    }
 
     private void arkadasOner(String kisiID) {
         // 1. Kullanıcı kontrolü

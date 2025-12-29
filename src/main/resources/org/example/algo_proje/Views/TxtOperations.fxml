@@ -27,10 +27,12 @@
                         <HBox spacing="10">
                             <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" onAction="#handleAreFriends" styleClass="button, btn-success" text="🤝 Arkadaş Mı?" />
                             <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" onAction="#handleShowFriends" styleClass="button, btn-info" text="👥 Listele" />
+                            <Button maxWidth="Infinity" HBox.hgrow="ALWAYS" onAction="#handleCommonFriends" styleClass="button, btn-info" text="🔗 Ortak Bul" />
                         </HBox>
 
                         <Button maxWidth="Infinity" onAction="#handleRecommendFriend" styleClass="button, btn-purple" text="➕ Arkadaş Önerisi Al" />
                         <Button maxWidth="Infinity" onAction="#handleRemoveFriend" styleClass="button, btn-danger" text="➖ Çıkarma Önerisi Al" />
+
 
                         <Separator prefWidth="200.0" />
 
